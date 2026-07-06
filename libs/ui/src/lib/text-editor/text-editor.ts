@@ -19,7 +19,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDivider } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { Editor, JSONContent } from '@tiptap/core';
+import { Editor } from '@tiptap/core';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import Placeholder from '@tiptap/extension-placeholder';
 import TextAlign from '@tiptap/extension-text-align';
@@ -28,7 +28,6 @@ import { common, createLowlight } from 'lowlight';
 import { ITextEditorToolbarAction } from './text-editor.interface';
 
 const lowlight = createLowlight(common);
-const MARKDOWN_WHITESPACE = /\n{3,}/g;
 
 function escapeHtml(value: string): string {
   return value
@@ -37,14 +36,6 @@ function escapeHtml(value: string): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
-}
-
-function escapeMarkdown(value: string): string {
-  return value.replace(/\\/g, '\\\\').replace(/\[/g, '\\[').replace(/\]/g, '\\]');
-}
-
-function escapeMarkdownCode(value: string): string {
-  return value.replace(/`/g, '\\`');
 }
 
 function isHtmlContent(value: string): boolean {
@@ -173,120 +164,6 @@ function parseInlineMarkdown(value: string): string {
   html = html.replace(/~~([^~]+)~~/g, '<s>$1</s>');
 
   return html;
-}
-
-function documentToMarkdown(document: JSONContent): string {
-  return renderMarkdownContent(document).replace(MARKDOWN_WHITESPACE, '\n\n').trim();
-}
-
-function renderMarkdownContent(node: JSONContent): string {
-  if (!node.content?.length) {
-    return '';
-  }
-
-  return node.content
-    .map((child, index) => renderMarkdownNode(child, index))
-    .filter(Boolean)
-    .join('\n\n');
-}
-
-function renderMarkdownNode(node: JSONContent, index: number): string {
-  const text = renderMarkdownInline(node.content ?? []);
-
-  if (node.type === 'paragraph') {
-    return text;
-  }
-
-  if (node.type === 'heading') {
-    const level = Math.min(Number(node.attrs?.['level'] ?? 1), 6);
-    return `${'#'.repeat(level)} ${text}`;
-  }
-
-  if (node.type === 'bulletList') {
-    return renderMarkdownList(node, false);
-  }
-
-  if (node.type === 'orderedList') {
-    return renderMarkdownList(node, true);
-  }
-
-  if (node.type === 'listItem') {
-    return text || renderMarkdownContent(node);
-  }
-
-  if (node.type === 'blockquote') {
-    return renderMarkdownContent(node)
-      .split('\n')
-      .map((line) => `> ${line}`)
-      .join('\n');
-  }
-
-  if (node.type === 'codeBlock') {
-    const language = typeof node.attrs?.['language'] === 'string' ? node.attrs['language'] : '';
-    return `\`\`\`${language}\n${text}\n\`\`\``;
-  }
-
-  if (node.type === 'horizontalRule') {
-    return '---';
-  }
-
-  if (node.type === 'hardBreak') {
-    return index > -1 ? '  \n' : '';
-  }
-
-  return renderMarkdownContent(node);
-}
-
-function renderMarkdownList(node: JSONContent, ordered: boolean): string {
-  return (node.content ?? [])
-    .map((item, index) => {
-      const marker = ordered ? `${index + 1}.` : '-';
-      const content = renderMarkdownContent(item)
-        .split('\n')
-        .map((line, lineIndex) => (lineIndex === 0 ? line : `   ${line}`))
-        .join('\n');
-
-      return `${marker} ${content}`;
-    })
-    .join('\n');
-}
-
-function renderMarkdownInline(content: JSONContent[]): string {
-  return content.map((node) => renderMarkdownInlineNode(node)).join('');
-}
-
-function renderMarkdownInlineNode(node: JSONContent): string {
-  if (node.type === 'text') {
-    return applyMarkdownMarks(escapeMarkdown(node.text ?? ''), node.marks ?? []);
-  }
-
-  if (node.type === 'hardBreak') {
-    return '  \n';
-  }
-
-  return renderMarkdownInline(node.content ?? []);
-}
-
-function applyMarkdownMarks(value: string, marks: NonNullable<JSONContent['marks']>): string {
-  return marks.reduce((nextValue, mark) => {
-    if (mark.type === 'bold') {
-      return `**${nextValue}**`;
-    }
-
-    if (mark.type === 'italic') {
-      return `*${nextValue}*`;
-    }
-
-    if (mark.type === 'strike') {
-      return `~~${nextValue}~~`;
-    }
-
-    if (mark.type === 'code') {
-      return `\`${escapeMarkdownCode(nextValue)}\``;
-    }
-
-    return nextValue;
-  }, value);
 }
 
 @Component({
@@ -551,9 +428,9 @@ export class UiTextEditor implements AfterViewInit, OnDestroy {
       onSelectionUpdate: () => this.changeDetectorRef.markForCheck(),
       onTransaction: () => this.changeDetectorRef.markForCheck(),
       onUpdate: ({ editor }) => {
-        const markdown = documentToMarkdown(editor.getJSON());
-        this.renderedValue = markdown;
-        this.value.set(markdown);
+        const html = editor.getHTML();
+        this.renderedValue = html;
+        this.value.set(html);
       }
     });
 

@@ -1,7 +1,14 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, ViewEncapsulation, computed, input } from '@angular/core';
 import { common, createLowlight } from 'lowlight';
+import { ILowlightNode, ITextContentMark, ITextContentNode } from '../../interfaces';
 
 const lowlight = createLowlight(common);
+const CODE_LANGUAGE_PATTERN = /language-([a-zA-Z0-9_-]+)/;
+const HTML_CODE_BLOCK_PATTERN = /<pre\b[^>]*>\s*<code\b([^>]*)>([\s\S]*?)<\/code>\s*<\/pre>/gi;
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
 
 function escapeHtml(value: string): string {
   return value
@@ -10,6 +17,19 @@ function escapeHtml(value: string): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
+}
+
+function isHtmlContent(value: string): boolean {
+  return /<\/?[a-z][\s\S]*>/i.test(value);
+}
+
+function decodeHtml(value: string): string {
+  return value
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, '&');
 }
 
 function parseInlineMarkdown(value: string): string {
@@ -23,9 +43,32 @@ function parseInlineMarkdown(value: string): string {
   return html;
 }
 
+function normalizeMarkdown(value: string): string {
+  let normalized = value.replace(/\r\n/g, '\n');
+
+  if (!normalized.includes('\n') && normalized.includes('\\n')) {
+    normalized = normalized.replace(/\\n/g, '\n');
+  }
+
+  return normalized
+    .replace(/```([a-zA-Z0-9_-]*)\s+([\s\S]*?)\s+```/g, (_match, language: string, code: string) => {
+      return `\n\`\`\`${language}\n${code.trim()}\n\`\`\`\n`;
+    })
+    .trim();
+}
+
+function parseTextAlignClass(attrs: Record<string, unknown> | undefined): string {
+  const textAlign = attrs?.['textAlign'];
+
+  return typeof textAlign === 'string' && ['center', 'right', 'justify'].includes(textAlign)
+    ? ` class="article-content-align-${textAlign}"`
+    : '';
+}
+
 function renderHighlightedCode(value: string, language: string): string {
   try {
-    const tree = language && lowlight.registered(language) ? lowlight.highlight(language, value) : lowlight.highlightAuto(value);
+    const tree =
+      language && lowlight.registered(language) ? lowlight.highlight(language, value) : lowlight.highlightAuto(value);
 
     return renderLowlightNodes(tree.children);
   } catch {
@@ -33,7 +76,14 @@ function renderHighlightedCode(value: string, language: string): string {
   }
 }
 
-function renderLowlightNodes(nodes: { properties?: { className?: unknown }; type?: string; value?: string; children?: unknown[] }[]): string {
+function renderCodeBlock(value: string, language: string): string {
+  const highlightedCode = renderHighlightedCode(value, language);
+  const languageClass = language ? ` class="language-${escapeHtml(language)}"` : '';
+
+  return `<pre><code${languageClass}>${highlightedCode}</code></pre>`;
+}
+
+function renderLowlightNodes(nodes: ILowlightNode[]): string {
   return nodes
     .map((node) => {
       if (node.type === 'text') {
@@ -43,24 +93,150 @@ function renderLowlightNodes(nodes: { properties?: { className?: unknown }; type
       const className = Array.isArray(node.properties?.className)
         ? node.properties.className.map(String).join(' ')
         : '';
-      const children = Array.isArray(node.children)
-        ? renderLowlightNodes(
-            node.children as {
-              properties?: { className?: unknown };
-              type?: string;
-              value?: string;
-              children?: unknown[];
-            }[]
-          )
-        : '';
+      const children = Array.isArray(node.children) ? renderLowlightNodes(node.children) : '';
 
       return className ? `<span class="${escapeHtml(className)}">${children}</span>` : children;
     })
     .join('');
 }
 
+function contentToHtml(value: unknown): string {
+  if (typeof value !== 'string') {
+    return richTextNodeToHtml(value);
+  }
+
+  const content = value.trim();
+
+  if (!content) {
+    return '';
+  }
+
+  const parsedContent = parseJsonContent(content);
+
+  if (parsedContent) {
+    return richTextNodeToHtml(parsedContent);
+  }
+
+  if (isHtmlContent(content)) {
+    return highlightHtmlCodeBlocks(content);
+  }
+
+  return markdownToHtml(content);
+}
+
+function highlightHtmlCodeBlocks(value: string): string {
+  return value.replace(HTML_CODE_BLOCK_PATTERN, (_match, attrs: string, code: string) => {
+    const language = CODE_LANGUAGE_PATTERN.exec(attrs)?.[1] ?? '';
+
+    return renderCodeBlock(decodeHtml(code), language);
+  });
+}
+
+function parseJsonContent(value: string): ITextContentNode | ITextContentNode[] | null {
+  if (!value.startsWith('{') && !value.startsWith('[')) {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(value) as unknown;
+
+    if (Array.isArray(parsed)) {
+      return parsed.filter(isRichTextNode);
+    }
+
+    return isRichTextNode(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function isRichTextNode(value: unknown): value is ITextContentNode {
+  return isRecord(value) && typeof value['type'] === 'string';
+}
+
+function richTextNodeToHtml(value: unknown): string {
+  if (Array.isArray(value)) {
+    return value.map((node) => richTextNodeToHtml(node)).join('');
+  }
+
+  if (!isRichTextNode(value)) {
+    return '';
+  }
+
+  const children = renderRichTextChildren(value.content);
+
+  switch (value.type) {
+    case 'doc':
+      return children;
+    case 'paragraph':
+      return `<p${parseTextAlignClass(value.attrs)}>${children}</p>`;
+    case 'heading': {
+      const level = Math.min(Math.max(Number(value.attrs?.['level'] ?? 2), 1), 6);
+      return `<h${level}${parseTextAlignClass(value.attrs)}>${children}</h${level}>`;
+    }
+    case 'bulletList':
+      return `<ul>${children}</ul>`;
+    case 'orderedList': {
+      const start = Number(value.attrs?.['start'] ?? 1);
+      const startAttr = Number.isFinite(start) && start > 1 ? ` start="${start}"` : '';
+      return `<ol${startAttr}>${children}</ol>`;
+    }
+    case 'listItem':
+      return `<li>${children}</li>`;
+    case 'blockquote':
+      return `<blockquote>${children}</blockquote>`;
+    case 'codeBlock': {
+      const language = typeof value.attrs?.['language'] === 'string' ? value.attrs['language'] : '';
+      const code = renderPlainText(value);
+      return renderCodeBlock(code, language);
+    }
+    case 'horizontalRule':
+      return '<hr>';
+    case 'hardBreak':
+      return '<br>';
+    case 'text':
+      return applyRichTextMarks(escapeHtml(value.text ?? ''), value.marks ?? []);
+    default:
+      return children;
+  }
+}
+
+function renderRichTextChildren(content: ITextContentNode[] | undefined): string {
+  return (content ?? []).map((node) => richTextNodeToHtml(node)).join('');
+}
+
+function renderPlainText(node: ITextContentNode): string {
+  if (node.type === 'text') {
+    return node.text ?? '';
+  }
+
+  return (node.content ?? []).map((child) => renderPlainText(child)).join('');
+}
+
+function applyRichTextMarks(value: string, marks: ITextContentMark[]): string {
+  return marks.reduce((nextValue, mark) => {
+    if (mark.type === 'bold') {
+      return `<strong>${nextValue}</strong>`;
+    }
+
+    if (mark.type === 'italic') {
+      return `<em>${nextValue}</em>`;
+    }
+
+    if (mark.type === 'strike') {
+      return `<s>${nextValue}</s>`;
+    }
+
+    if (mark.type === 'code') {
+      return `<code>${nextValue}</code>`;
+    }
+
+    return nextValue;
+  }, value);
+}
+
 function markdownToHtml(value: string): string {
-  const lines = value.replace(/\r\n/g, '\n').split('\n');
+  const lines = normalizeMarkdown(value).split('\n');
   const html: string[] = [];
   let index = 0;
 
@@ -73,7 +249,7 @@ function markdownToHtml(value: string): string {
     }
 
     if (line.startsWith('```')) {
-      const language = escapeHtml(line.slice(3).trim());
+      const language = line.slice(3).trim();
       const codeLines: string[] = [];
       index += 1;
 
@@ -87,9 +263,7 @@ function markdownToHtml(value: string): string {
       }
 
       const code = codeLines.join('\n');
-      const highlightedCode = renderHighlightedCode(code, language);
-      const languageClass = language ? ` class="language-${language}"` : '';
-      html.push(`<pre><code${languageClass}>${highlightedCode}</code></pre>`);
+      html.push(renderCodeBlock(code, language));
       continue;
     }
 
@@ -168,6 +342,7 @@ function markdownToHtml(value: string): string {
 
 @Component({
   selector: 'blog-article-content',
+  encapsulation: ViewEncapsulation.None,
   template: `
     <div
       class="article-content text-lg leading-8 text-gray-700 dark:text-gray-300"
@@ -175,14 +350,23 @@ function markdownToHtml(value: string): string {
   `,
   styles: [
     `
-      .article-content :where(* + *) {
-        margin-top: 1.25rem;
+      .article-content > :where(* + *) {
+        margin-top: 1rem;
+      }
+
+      .article-content :where(li + li) {
+        margin-top: 0.375rem;
+      }
+
+      .article-content :where(li > :first-child) {
+        margin-top: 0;
       }
 
       .article-content :where(h1, h2, h3, h4, h5, h6) {
         color: var(--mat-sys-on-surface);
         font-weight: var(--font-weight-semibold);
         line-height: var(--leading-tight);
+        scroll-margin-top: 6rem;
       }
 
       .article-content :where(h1) {
@@ -195,6 +379,26 @@ function markdownToHtml(value: string): string {
 
       .article-content :where(h3) {
         font-size: var(--text-2xl);
+      }
+
+      .article-content :where(h4, h5, h6) {
+        font-size: var(--text-xl);
+      }
+
+      .article-content :where(p) {
+        overflow-wrap: anywhere;
+      }
+
+      .article-content :where(.article-content-align-center) {
+        text-align: center;
+      }
+
+      .article-content :where(.article-content-align-right) {
+        text-align: right;
+      }
+
+      .article-content :where(.article-content-align-justify) {
+        text-align: justify;
       }
 
       .article-content :where(ul),
@@ -213,7 +417,19 @@ function markdownToHtml(value: string): string {
       .article-content :where(blockquote) {
         border-left: 3px solid var(--mat-sys-outline-variant);
         color: var(--mat-sys-on-surface-variant);
+        font-style: italic;
+        margin-block: 1.25rem;
         padding-left: 1rem;
+      }
+
+      .article-content :where(blockquote > :first-child) {
+        margin-top: 0;
+      }
+
+      .article-content :where(hr) {
+        border: 0;
+        border-top: 1px solid var(--mat-sys-outline-variant);
+        margin-block: 2rem;
       }
 
       .article-content :where(a) {
@@ -237,6 +453,8 @@ function markdownToHtml(value: string): string {
         background: #282c34;
         color: #abb2bf;
         font-family: var(--font-mono);
+        margin-block: 1.25rem;
+        max-width: 100%;
         padding: 1rem;
       }
 
@@ -297,11 +515,16 @@ function markdownToHtml(value: string): string {
       .article-content :where(.hljs-strong) {
         font-weight: var(--font-weight-semibold);
       }
+
+      .article-content :where(img) {
+        border-radius: 0.5rem;
+        max-width: 100%;
+      }
     `
   ]
 })
 export class ArticleContent {
-  readonly content = input<string>('');
+  readonly content = input<unknown>('');
 
-  protected readonly renderedContent = computed(() => markdownToHtml(this.content()));
+  protected readonly renderedContent = computed(() => contentToHtml(this.content()));
 }

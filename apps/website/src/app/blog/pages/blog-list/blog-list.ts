@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ThemeToggle } from '@libs/ui';
 import { DEFAULT_LIMIT, IArticle } from '@libs/utils';
 import { ArticlesStore } from '../../data-access';
 import { ArticleCard } from '../../ui/article-card/article-card';
@@ -12,7 +13,15 @@ import { ArticleCard } from '../../ui/article-card/article-card';
 @Component({
   selector: 'blog-list',
   providers: [ArticlesStore],
-  imports: [ArticleCard, MatButtonModule, MatIconModule, MatPaginatorModule, MatProgressSpinnerModule, RouterLink],
+  imports: [
+    ArticleCard,
+    MatButtonModule,
+    MatIconModule,
+    MatPaginatorModule,
+    MatProgressSpinnerModule,
+    RouterLink,
+    ThemeToggle
+  ],
   templateUrl: './blog-list.html'
 })
 export class BlogList {
