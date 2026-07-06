@@ -8,19 +8,8 @@ import { IUserPayload, IUserQuery } from '../interfaces';
 export class UsersService {
   private readonly http = inject(HttpClient);
 
-  create(dto: IUserPayload): Observable<IUser> {
-    return this.http.post<IUser>('/users', dto);
-  }
-
   delete(userId: string): Observable<void> {
     return this.http.delete<void>(`/users/${userId}`);
-  }
-
-  exportCsv(query: IUserQuery): Observable<Blob> {
-    return this.http.get('/users/export/csv', {
-      params: createParams(query),
-      responseType: 'blob'
-    });
   }
 
   findAll(query: IUserQuery): Observable<[IUser[], number]> {
@@ -29,12 +18,6 @@ export class UsersService {
 
   findOneByEmail(email: string): Observable<IUser> {
     return this.http.get<IUser>(`/users/${encodeURIComponent(email)}`);
-  }
-
-  importCsv(file: File): Observable<void> {
-    const formData = new FormData();
-    formData.append('file', file);
-    return this.http.post<void>('/users/import/csv', formData);
   }
 
   update(userId: string, dto: IUserPayload): Observable<IUser> {

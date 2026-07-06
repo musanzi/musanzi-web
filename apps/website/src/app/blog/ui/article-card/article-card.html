@@ -1,0 +1,49 @@
+<mat-card appearance="outlined" class="overflow-hidden border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
+  <mat-card-content class="grid gap-5 p-0 md:grid-cols-[14rem_minmax(0,1fr)]">
+    <a
+      class="flex aspect-video items-center justify-center overflow-hidden bg-gray-100 text-gray-500 md:aspect-auto dark:bg-zinc-800 dark:text-gray-400"
+      [routerLink]="['/blog', article().slug]"
+      [attr.aria-label]="'Read ' + article().title">
+      @if (coverUrl(); as cover) {
+      <img class="size-full object-cover" [src]="cover" [alt]="article().title + ' cover'" />
+      } @else {
+      <mat-icon class="size-10" svgIcon="newspaper" />
+      }
+    </a>
+
+    <div class="grid gap-4 p-5 md:pl-0">
+      <div>
+        <div class="flex flex-wrap items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+          @if (article().publishedAt) {
+          <time [dateTime]="article().publishedAt">{{ article().publishedAt | date: 'mediumDate' }}</time>
+          } @else {
+          <span>Draft</span>
+          }
+          @if (article().tags.length) {
+          <span aria-hidden="true">/</span>
+          <mat-chip-set aria-label="Article tags">
+            @for (tag of article().tags; track tag.id) {
+            <mat-chip>{{ tag.name }}</mat-chip>
+            }
+          </mat-chip-set>
+          }
+        </div>
+
+        <h2 class="mt-3 text-2xl leading-tight font-semibold text-gray-950 dark:text-gray-50">
+          <a class="hover:text-primary focus-visible:outline-primary" [routerLink]="['/blog', article().slug]">
+            {{ article().title }}
+          </a>
+        </h2>
+
+        <p class="mt-3 text-base leading-7 text-gray-600 dark:text-gray-300">{{ article().summary }}</p>
+      </div>
+
+      <div>
+        <a matButton="outlined" [routerLink]="['/blog', article().slug]">
+          Read article
+          <mat-icon svgIcon="arrow-right" />
+        </a>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

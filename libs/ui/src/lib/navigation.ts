@@ -31,8 +31,7 @@ import { filter, take } from 'rxjs';
               [ngTemplateOutletContext]="{
                 nodes: section.children,
                 parent: tree
-              }"
-            />
+              }" />
           </ul>
 
           <ng-template let-nodes="nodes" let-parent="parent" #treeNodes>
@@ -52,8 +51,7 @@ import { filter, take } from 'rxjs';
                 [routerLinkActiveOptions]="node.activeOptions ?? { exact: true }"
                 (click)="$event.preventDefault()"
                 #rla="routerLinkActive"
-                #treeItem="ngTreeItem"
-              >
+                #treeItem="ngTreeItem">
                 @if (node.icon) {
                   <mat-icon class="pointer-events-none size-4" [svgIcon]="node.icon" />
                 }
@@ -78,8 +76,7 @@ import { filter, take } from 'rxjs';
                   <mat-icon
                     svgIcon="chevron-right"
                     class="pointer-events-none size-4 transition-[rotate]"
-                    [class.rotate-90]="node.expanded"
-                  />
+                    [class.rotate-90]="node.expanded" />
                 }
               </a>
 
@@ -88,16 +85,14 @@ import { filter, take } from 'rxjs';
                   class="flex flex-col gap-y-1 [&_ul>.navigation-item]:pl-14.5 [&>.navigation-item]:pl-8.5"
                   [class.hidden]="!node.expanded"
                   [class.mt-1]="node.expanded"
-                  role="group"
-                >
+                  role="group">
                   <ng-template ngTreeItemGroup [ownedBy]="treeItem" #group="ngTreeItemGroup">
                     <ng-template
                       [ngTemplateOutlet]="treeNodes"
                       [ngTemplateOutletContext]="{
                         nodes: node.children,
                         parent: group
-                      }"
-                    />
+                      }" />
                   </ng-template>
                 </ul>
               }

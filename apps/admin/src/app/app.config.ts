@@ -7,7 +7,7 @@ import { provideRouter, TitleStrategy, withComponentInputBinding, withInMemorySc
 import { provideIcons, provideTheming } from '@libs/core';
 import { provideApp } from './app.provider';
 import { routes } from './app.routes';
-import { httpInterceptor, PageTitleStrategy } from './shared';
+import { httpInterceptor, PageTitleStrategy } from './core';
 
 export const appConfig: ApplicationConfig = {
   providers: [

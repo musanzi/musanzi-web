@@ -61,16 +61,6 @@
           [disabled]="signInForm().invalid() || authStore.isLoading()">
           {{ authStore.isLoading() ? 'Signing in...' : 'Sign in' }}
         </button>
-
-        <div class="mt-8 flex items-center gap-x-4">
-          <mat-divider class="flex-auto" />
-          <div class="text-neutral-500">Or continue with</div>
-          <mat-divider class="flex-auto" />
-        </div>
-
-        <div class="mt-8 flex items-center space-x-4">
-          <a matButton="outlined" class="flex-auto" [href]="googleSignInUrl">Google</a>
-        </div>
       </form>
     </div>
   </div>

@@ -86,7 +86,7 @@ export class Roles {
           return;
         }
 
-        this.rolesStore.saveRole({ payload, query: this.query });
+        this.rolesStore.saveRole({ payload });
       });
   }
 
@@ -123,7 +123,7 @@ export class Roles {
           return;
         }
 
-        this.rolesStore.saveRole({ payload, query: this.query, roleId: role.id });
+        this.rolesStore.saveRole({ payload, roleId: role.id });
       });
   }
 

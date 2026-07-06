@@ -1,15 +1,13 @@
 import { computed, inject } from '@angular/core';
-import { decrementTotal, getApiErrorMessage } from '@libs/utils';
+import { getApiErrorMessage } from '@libs/utils';
 import { patchState, signalStore, withComputed, withMethods, withProps, withState } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { catchError, exhaustMap, finalize, of, pipe, tap } from 'rxjs';
-import { ICreateUserPayload, IDeleteUserPayload, IImportCsvPayload, IUserQuery, IUsersState } from '../interfaces';
+import { catchError, exhaustMap, finalize, map, of, pipe, tap } from 'rxjs';
+import { IDeleteUserPayload, IUserPayload, IUserQuery, IUsersState } from '../interfaces';
 import { UsersService } from './users.service';
 
 const initialState: IUsersState = {
   error: null,
-  isExporting: false,
-  isImporting: false,
   isLoading: false,
   success: null,
   data: [[], 0]
@@ -32,7 +30,7 @@ export const UsersStore = signalStore(
           usersService.findAll(query).pipe(
             tap((data) => patchState(store, { data })),
             catchError((error: Error) => {
-              patchState(store, { error: getApiErrorMessage(error, "Unable to load users") });
+              patchState(store, { error: getApiErrorMessage(error, 'Unable to load users') });
               return of(null);
             }),
             finalize(() => patchState(store, { isLoading: false }))
@@ -40,7 +38,6 @@ export const UsersStore = signalStore(
         )
       )
     );
-
     return {
       loadUsers,
       deleteUser: rxMethod<IDeleteUserPayload>(
@@ -51,16 +48,15 @@ export const UsersStore = signalStore(
               tap(() => {
                 const [users, total] = store.data();
                 const nextUsers = users.filter((user) => user.id !== userId);
-                const wasDeleted = nextUsers.length !== users.length;
 
                 patchState(store, {
-                  data: [nextUsers, wasDeleted ? decrementTotal(total) : total],
-                  success: "User deleted."
+                  data: [nextUsers, total - 1],
+                  success: 'User deleted.'
                 });
               }),
               catchError((error: Error) => {
                 patchState(store, {
-                  error: getApiErrorMessage(error, "Unable to delete the user")
+                  error: getApiErrorMessage(error, 'Unable to delete the user')
                 });
                 return of(null);
               })
@@ -68,81 +64,22 @@ export const UsersStore = signalStore(
           )
         )
       ),
-      exportCsv: rxMethod<IUserQuery>(
-        pipe(
-          tap(() => patchState(store, { error: null, isExporting: true, success: null })),
-          exhaustMap((query) =>
-            usersService.exportCsv(query).pipe(
-              tap((blob) => {
-                const url = URL.createObjectURL(blob);
-                const anchor = document.createElement('a');
-                anchor.href = url;
-                anchor.download = 'users.csv';
-                anchor.click();
-                URL.revokeObjectURL(url);
-                patchState(store, { success: "CSV export generated." });
-              }),
-              catchError((error: Error) => {
-                patchState(store, {
-                  error: getApiErrorMessage(error, "Unable to export users")
-                });
-                return of(null);
-              }),
-              finalize(() => patchState(store, { isExporting: false }))
-            )
-          )
-        )
-      ),
-      importCsv: rxMethod<IImportCsvPayload>(
-        pipe(
-          tap(() => patchState(store, { error: null, isImporting: true, success: null })),
-          exhaustMap(({ file, query }) =>
-            usersService.importCsv(file).pipe(
-              tap(() => {
-                patchState(store, { success: "CSV import completed." });
-                loadUsers(query);
-              }),
-              catchError((error: Error) => {
-                patchState(store, {
-                  error: getApiErrorMessage(error, "Unable to import users")
-                });
-                return of(null);
-              }),
-              finalize(() => patchState(store, { isImporting: false }))
-            )
-          )
-        )
-      ),
-      saveUser: rxMethod<ICreateUserPayload>(
+      updatedUser: rxMethod<{ userId: string; payload: IUserPayload }>(
         pipe(
           tap(() => patchState(store, { error: null, success: null })),
-          exhaustMap(({ payload, userId }) => {
-            const request = userId ? usersService.update(userId, payload) : usersService.create(payload);
-
-            return request.pipe(
-              tap((savedUser) => {
+          exhaustMap(({ userId, payload }) => {
+            return usersService.update(userId, payload).pipe(
+              map((savedUser) => {
                 const [users, total] = store.data();
 
-                if (userId) {
-                  patchState(store, {
-                    data: [users.map((user) => (user.id === userId ? savedUser : user)), total],
-                    success: "User updated."
-                  });
-
-                  return;
-                }
-
                 patchState(store, {
-                  data: [[savedUser, ...users], total + 1],
-                  success: "User created."
+                  data: [users.map((user) => (user.id === userId ? savedUser : user)), total],
+                  success: 'User updated.'
                 });
               }),
               catchError((error: Error) => {
                 patchState(store, {
-                  error: getApiErrorMessage(
-                    error,
-                    userId ? 'Unable to update the user' : 'Unable to create the user'
-                  )
+                  error: getApiErrorMessage(error)
                 });
                 return of(null);
               })

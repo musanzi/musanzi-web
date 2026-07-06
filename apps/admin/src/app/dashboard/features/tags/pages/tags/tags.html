@@ -1,0 +1,106 @@
+<section class="flex flex-col gap-6 p-4 sm:p-6 lg:p-8">
+  <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+    <div>
+      <h1 class="text-2xl font-semibold text-on-surface">Tags</h1>
+      <p class="mt-1 text-sm text-on-surface-variant">Manage reusable tags for content organization.</p>
+    </div>
+
+    <button matButton="filled" (click)="createTag()">
+      <mat-icon svgIcon="plus" />
+      Add tag
+    </button>
+  </div>
+
+  <mat-card appearance="filled" class="flex flex-col">
+    <mat-card-header>
+      <div class="flex flex-auto flex-col gap-4 md:flex-row md:items-center">
+        <div class="flex items-center gap-x-2">
+          <mat-icon class="size-4" svgIcon="tags" />
+          <div class="font-medium tracking-tight">Tag list</div>
+        </div>
+
+        <mat-form-field class="w-full md:ml-auto md:max-w-sm">
+          <mat-icon matPrefix svgIcon="search" />
+          <input matInput [formControl]="searchControl" placeholder="Tag name" />
+        </mat-form-field>
+      </div>
+    </mat-card-header>
+
+    <mat-card-content class="flex flex-auto flex-col overflow-hidden p-0">
+      <div class="flex flex-col">
+        <div class="relative isolate overflow-x-visible overflow-y-hidden">
+          @if (tagsStore.isLoading()) {
+          <div class="-mt-px min-w-full whitespace-nowrap" aria-busy="true" aria-label="Loading tags">
+            <div
+              class="grid min-h-14 grid-cols-[minmax(14rem,1fr)_10rem_8rem] items-center border-b border-neutral-200 px-6 text-xs font-medium uppercase tracking-wide text-on-surface-variant dark:border-neutral-800">
+              <div>Name</div>
+              <div>Updated</div>
+              <div class="text-right">Actions</div>
+            </div>
+
+            <div class="divide-y divide-neutral-200 dark:divide-neutral-800">
+              @for (row of [1, 2, 3, 4, 5, 6]; track row) {
+              <div class="grid min-h-16 grid-cols-[minmax(14rem,1fr)_10rem_8rem] items-center px-6">
+                <div class="flex items-center gap-3">
+                  <div class="size-9 animate-pulse rounded-full bg-neutral-200 dark:bg-neutral-700"></div>
+                  <div class="h-3.5 w-40 animate-pulse rounded-full bg-neutral-300 dark:bg-neutral-600"></div>
+                </div>
+                <div class="h-3.5 w-24 animate-pulse rounded-full bg-neutral-300 dark:bg-neutral-600"></div>
+                <div class="ml-auto flex gap-2">
+                  <div class="size-9 animate-pulse rounded-full bg-neutral-200 dark:bg-neutral-700"></div>
+                  <div class="size-9 animate-pulse rounded-full bg-neutral-300/80 dark:bg-neutral-700/70"></div>
+                </div>
+              </div>
+              }
+            </div>
+          </div>
+          } @else {
+
+          <table class="-mt-px whitespace-nowrap" mat-table [dataSource]="tagsStore.tags()" [trackBy]="trackBy">
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Name</th>
+              <td mat-cell *matCellDef="let tag">{{ tag.name }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="updatedAt">
+              <th mat-header-cell *matHeaderCellDef>Updated</th>
+              <td mat-cell *matCellDef="let tag">
+                <span class="tabular-nums">{{ tag.updatedAt | date: 'mediumDate' }}</span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef class="w-32 text-right">Actions</th>
+              <td mat-cell *matCellDef="let tag" class="text-right">
+                <button matIconButton type="button" aria-label="Edit tag" (click)="editTag(tag)">
+                  <mat-icon svgIcon="pencil" />
+                </button>
+                <button matIconButton type="button" aria-label="Delete tag" (click)="deleteTag(tag)">
+                  <mat-icon svgIcon="trash-2" />
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr
+              class="group hover:bg-on-surface-variant/4 relative"
+              mat-row
+              *matRowDef="let row; columns: displayedColumns"></tr>
+          </table>
+
+          @if (!tagsStore.isLoading() && tagsStore.tags().length === 0) {
+          <div class="flex min-h-32 items-center justify-center text-sm text-on-surface-variant">No tags found.</div>
+          } }
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-paginator
+    [length]="tagsStore.total()"
+    [pageIndex]="query.page - 1"
+    [pageSize]="query.limit"
+    [pageSizeOptions]="[20, 50, 100]"
+    (page)="pageChanged($event)"
+    showFirstLastButtons />
+</section>

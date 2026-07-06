@@ -2,7 +2,6 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Service } from '@angular/core';
 import { IUser } from '@libs/utils';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment';
 import {
   IForgotPasswordPayload,
   IResetPasswordPayload,
@@ -48,9 +47,5 @@ export class AuthService {
 
   getProfile(): Observable<IUser> {
     return this.http.get<IUser>('/auth/me');
-  }
-
-  getGoogleSignInUrl(): string {
-    return `${environment.apiUrl}/auth/signin/google?target=admin`;
   }
 }

@@ -1,36 +1,25 @@
 import { Component, inject, signal } from '@angular/core';
 import { email, form, FormField, required, submit } from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDivider } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService, AuthStore } from '../../data-access';
+import { AuthStore } from '../../data-access';
 
 @Component({
   selector: 'auth-sign-in',
   templateUrl: './sign-in.html',
-  imports: [
-    RouterLink,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatIconModule,
-    FormField,
-    MatDivider
-  ]
+  imports: [RouterLink, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule, FormField]
 })
 export class AuthSignIn {
   protected authStore = inject(AuthStore);
-  private authService = inject(AuthService);
   private router = inject(Router);
-  protected googleSignInUrl = this.authService.getGoogleSignInUrl();
   protected successMessage = signal<string | null>(this.getSuccessMessage());
 
   protected signInFormModel = signal({
-    email: 'admin@admin.com',
-    password: 'admin1234'
+    email: '',
+    password: ''
   });
   protected signInForm = form(this.signInFormModel, (form) => {
     required(form.email, { message: 'You must enter an email address' });

@@ -15,21 +15,6 @@
       <div class="flex flex-auto items-center gap-x-2">
         <mat-icon class="size-4" svgIcon="users" />
         <div class="font-medium tracking-tight">User list</div>
-
-        <div class="ml-auto">
-          <button class="tiny" matIconButton [matMenuTriggerFor]="userMenu">
-            <mat-icon svgIcon="ellipsis-vertical" />
-          </button>
-          <mat-menu #userMenu="matMenu">
-            <button mat-menu-item (click)="exportCsv()" [disabled]="usersStore.isExporting()">
-              Export CSV
-            </button>
-            <button mat-menu-item (click)="openFilePicker()" [disabled]="usersStore.isImporting()">
-              Import CSV
-            </button>
-          </mat-menu>
-          <input #fileInput type="file" accept=".csv,text/csv" class="hidden" (change)="importCsv($event)" />
-        </div>
       </div>
     </mat-card-header>
 
@@ -107,18 +92,10 @@
             <ng-container matColumnDef="actions">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>Actions</th>
               <td mat-cell *matCellDef="let user">
-                <button
-                  matIconButton
-                  type="button"
-                  aria-label="Edit user"
-                  (click)="editUser(user)">
+                <button matIconButton type="button" aria-label="Edit user" (click)="editUser(user)">
                   <mat-icon svgIcon="pencil" />
                 </button>
-                <button
-                  matIconButton
-                  type="button"
-                  aria-label="Delete user"
-                  (click)="deleteUser(user)">
+                <button matIconButton type="button" aria-label="Delete user" (click)="deleteUser(user)">
                   <mat-icon svgIcon="trash-2" />
                 </button>
               </td>
@@ -135,9 +112,7 @@
           </table>
 
           @if (!usersStore.isLoading() && usersStore.users().length === 0) {
-          <div class="flex min-h-32 items-center justify-center text-sm text-on-surface-variant">
-            No users found.
-          </div>
+          <div class="flex min-h-32 items-center justify-center text-sm text-on-surface-variant">No users found.</div>
           } }
         </div>
       </div>

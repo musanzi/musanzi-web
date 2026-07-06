@@ -4,14 +4,48 @@ export const NAVIGATION: INavigationItem[] = [
   {
     id: 'general',
     label: 'General',
-    description: 'Resource management',
+    description: 'Overview',
     children: [
       {
         id: 'dashboard',
         label: 'Dashboard',
         route: '/',
         icon: 'layout-dashboard'
+      }
+    ]
+  },
+  {
+    id: 'content',
+    label: 'Content',
+    description: 'Publishing',
+    children: [
+      {
+        id: 'projects',
+        label: 'Projects',
+        route: '/projects',
+        icon: 'app-window',
+        activeOptions: { exact: false }
       },
+      {
+        id: 'articles',
+        label: 'Articles',
+        route: '/articles',
+        icon: 'newspaper',
+        activeOptions: { exact: false }
+      },
+      {
+        id: 'tags',
+        label: 'Tags',
+        route: '/tags',
+        icon: 'tags'
+      }
+    ]
+  },
+  {
+    id: 'access',
+    label: 'Access',
+    description: 'User management',
+    children: [
       {
         id: 'roles',
         label: 'Roles',

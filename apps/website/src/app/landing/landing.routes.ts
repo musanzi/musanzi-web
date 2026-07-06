@@ -11,6 +11,10 @@ export const landingRoutes: Routes = [
         title: 'Home',
         loadComponent: () => import('./pages/home/home').then((c) => c.Home)
       },
+      {
+        path: 'blog',
+        loadChildren: () => import('../blog/blog.routes').then((r) => r.blogRoutes)
+      },
       { path: '**', redirectTo: '/' }
     ]
   }

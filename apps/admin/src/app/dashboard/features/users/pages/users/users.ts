@@ -5,7 +5,6 @@ import { MatCard, MatCardHeader, MatCardContent } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
@@ -29,9 +28,6 @@ import { UserFormDialog } from '../../ui/user-form-dialog/user-form-dialog';
     MatCard,
     MatCardHeader,
     MatCardContent,
-    MatMenu,
-    MatMenuItem,
-    MatMenuTrigger,
     MatIconButton
   ],
   templateUrl: './users.html'
@@ -107,21 +103,6 @@ export class Users {
     this.openUserDialog(user);
   }
 
-  protected exportCsv(): void {
-    this.usersStore.exportCsv(this.query);
-  }
-
-  protected importCsv(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) {
-      return;
-    }
-
-    input.value = '';
-    this.usersStore.importCsv({ file, query: this.query });
-  }
-
   protected openFilePicker(): void {
     this.fileInput()?.nativeElement.click();
   }
@@ -165,11 +146,9 @@ export class Users {
       .afterClosed()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((payload) => {
-        if (!payload) {
-          return;
-        }
+        if (!payload || !user) return;
 
-        this.usersStore.saveUser({ payload, query: this.query, userId: user?.id });
+        this.usersStore.updatedUser({ userId: user.id, payload });
       });
   }
 }

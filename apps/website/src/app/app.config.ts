@@ -6,7 +6,7 @@ import { provideClientHydration } from '@angular/platform-browser';
 import { provideRouter, TitleStrategy, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
 import { provideIcons, provideTheming } from '@libs/core';
 import { routes } from './app.routes';
-import { httpInterceptor, PageTitleStrategy } from './shared';
+import { httpInterceptor, PageTitleStrategy } from './core';
 
 export const appConfig: ApplicationConfig = {
   providers: [

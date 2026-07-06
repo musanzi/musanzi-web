@@ -1,0 +1,51 @@
+<main class="mx-auto w-[calc(100%-4rem)] max-w-4xl overflow-x-hidden py-9 pb-24 md:py-12">
+  <header class="mb-10 flex flex-col gap-6 md:mb-14">
+    <a matButton="outlined" routerLink="/">
+      <mat-icon svgIcon="arrow-left" />
+      Home
+    </a>
+
+    <div>
+      <p class="inline-flex items-center gap-2 text-base font-bold text-gray-500 dark:text-gray-300">
+        <mat-icon class="size-4.5" svgIcon="newspaper" />
+        Blog
+      </p>
+      <h1 class="mt-3 max-w-[14ch] text-4xl leading-none font-bold text-gray-950 md:text-6xl dark:text-gray-50">
+        Articles and notes.
+      </h1>
+      <p class="mt-6 max-w-2xl text-lg leading-8 text-gray-600 dark:text-gray-300">
+        Practical writing about web applications, product engineering, and delivery.
+      </p>
+    </div>
+  </header>
+
+  @if (articlesStore.isLoading()) {
+  <section class="grid min-h-64 place-items-center" aria-busy="true" aria-label="Loading articles">
+    <mat-spinner diameter="40" />
+  </section>
+  } @else if (articlesStore.error()) {
+  <section class="rounded-md border border-red-200 bg-red-50 p-5 text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
+    {{ articlesStore.error() }}
+  </section>
+  } @else if (articlesStore.articles().length) {
+  <section class="grid gap-5" aria-label="Articles">
+    @for (article of articlesStore.articles(); track trackBy($index, article)) {
+    <blog-article-card [article]="article" />
+    }
+  </section>
+
+  <mat-paginator
+    class="mt-8 rounded-md border border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-900"
+    [length]="articlesStore.total()"
+    [pageIndex]="page - 1"
+    [pageSize]="limit"
+    [hidePageSize]="true"
+    (page)="pageChanged($event)" />
+  } @else {
+  <section class="rounded-md border border-gray-200 bg-white p-8 text-center dark:border-zinc-700 dark:bg-zinc-900">
+    <mat-icon class="mx-auto size-10 text-gray-400 dark:text-gray-500" svgIcon="newspaper" />
+    <h2 class="mt-4 text-2xl font-semibold text-gray-950 dark:text-gray-50">No articles yet</h2>
+    <p class="mt-2 text-base text-gray-600 dark:text-gray-300">Published articles will appear here.</p>
+  </section>
+  }
+</main>

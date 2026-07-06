@@ -1,0 +1,50 @@
+<main class="mx-auto w-[calc(100%-4rem)] max-w-3xl overflow-x-hidden py-9 pb-24 md:py-12">
+  <header class="mb-10">
+    <a matButton="outlined" routerLink="/blog">
+      <mat-icon svgIcon="arrow-left" />
+      Blog
+    </a>
+  </header>
+
+  @if (articlesStore.isLoading()) {
+  <section class="grid min-h-64 place-items-center" aria-busy="true" aria-label="Loading article">
+    <mat-spinner diameter="40" />
+  </section>
+  } @else if (articlesStore.error()) {
+  <section class="rounded-md border border-red-200 bg-red-50 p-5 text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
+    {{ articlesStore.error() }}
+  </section>
+  } @else if (articlesStore.article(); as article) {
+  <article>
+    <div class="mb-8">
+      <div class="flex flex-wrap items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+        @if (article.publishedAt) {
+        <time [dateTime]="article.publishedAt">{{ article.publishedAt | date: 'mediumDate' }}</time>
+        }
+        @if (article.tags.length) {
+        <mat-chip-set aria-label="Article tags">
+          @for (tag of article.tags; track tag.id) {
+          <mat-chip>{{ tag.name }}</mat-chip>
+          }
+        </mat-chip-set>
+        }
+      </div>
+
+      <h1 class="mt-4 text-4xl leading-none font-bold text-gray-950 md:text-6xl dark:text-gray-50">
+        {{ article.title }}
+      </h1>
+
+      <p class="mt-6 text-xl leading-8 text-gray-600 dark:text-gray-300">{{ article.summary }}</p>
+    </div>
+
+    @if (coverUrl(); as cover) {
+    <div
+      class="mb-10 aspect-video overflow-hidden rounded-md border border-gray-200 bg-gray-100 dark:border-zinc-700 dark:bg-zinc-800">
+      <img class="size-full object-cover" [src]="cover" [alt]="article.title + ' cover'" />
+    </div>
+    }
+
+    <blog-article-content [content]="article.content ?? ''" />
+  </article>
+  }
+</main>

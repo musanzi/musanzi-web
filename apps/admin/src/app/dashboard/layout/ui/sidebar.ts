@@ -13,7 +13,7 @@ import { getProfileAvatarUrl } from '../../utils';
   template: `
     <div class="relative flex items-center gap-x-2.5 pt-5 pr-4 pb-0 pl-6">
       <div class="flex flex-col">
-        <div class="text-on-surface text-lg leading-none font-bold tracking-wider">ADMIN</div>
+        <div class="text-on-surface text-lg leading-none font-bold tracking-wider">ADMIN - MUSANZI</div>
       </div>
     </div>
 

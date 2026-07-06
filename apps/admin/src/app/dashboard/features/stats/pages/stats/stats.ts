@@ -1,6 +1,5 @@
 import { Component, effect, inject } from '@angular/core';
 import { MatCard, MatCardContent, MatCardHeader } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DecimalPipe } from '@angular/common';
 import { IStat } from '../../interfaces';
@@ -9,7 +8,7 @@ import { StatsStore } from '../../data-access';
 @Component({
   selector: 'admin-stats',
   providers: [StatsStore],
-  imports: [DecimalPipe, MatCard, MatCardContent, MatCardHeader, MatIconModule],
+  imports: [DecimalPipe, MatCard, MatCardContent, MatCardHeader],
   templateUrl: './stats.html'
 })
 export class Stats {

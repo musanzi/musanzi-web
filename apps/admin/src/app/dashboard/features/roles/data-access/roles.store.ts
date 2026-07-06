@@ -1,5 +1,5 @@
 import { computed, inject } from '@angular/core';
-import { decrementTotal, getApiErrorMessage, matchesQuery } from '@libs/utils';
+import { getApiErrorMessage } from '@libs/utils';
 import { patchState, signalStore, withComputed, withMethods, withProps, withState } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { catchError, exhaustMap, finalize, of, pipe, tap } from 'rxjs';
@@ -31,7 +31,7 @@ export const RolesStore = signalStore(
           rolesService.findAll(query).pipe(
             tap((data) => patchState(store, { data })),
             catchError((error: Error) => {
-              patchState(store, { error: getApiErrorMessage(error, "Unable to load roles") });
+              patchState(store, { error: getApiErrorMessage(error) });
               return of(null);
             }),
             finalize(() => patchState(store, { isLoading: false }))
@@ -47,15 +47,14 @@ export const RolesStore = signalStore(
             tap(() => {
               const [roles, total] = store.data();
               const nextRoles = roles.filter((role) => role.id !== roleId);
-              const wasDeleted = nextRoles.length !== roles.length;
 
               patchState(store, {
-                data: [nextRoles, wasDeleted ? decrementTotal(total) : total],
-                success: "Role deleted."
+                data: [nextRoles, total - 1],
+                success: 'Role deleted.'
               });
             }),
             catchError((error: Error) => {
-              patchState(store, { error: getApiErrorMessage(error, "Unable to delete the role") });
+              patchState(store, { error: getApiErrorMessage(error, 'Unable to delete the role') });
               return of(null);
             })
           )
@@ -65,37 +64,29 @@ export const RolesStore = signalStore(
     saveRole: rxMethod<ISaveRolePayload>(
       pipe(
         tap(() => patchState(store, { error: null, success: null })),
-        exhaustMap(({ payload, query, roleId }) => {
+        exhaustMap(({ payload, roleId }) => {
           const request = roleId ? rolesService.update(roleId, payload) : rolesService.create(payload);
           return request.pipe(
             tap((savedRole) => {
               const [roles, total] = store.data();
 
               if (roleId) {
-                const roleExists = roles.some((role) => role.id === roleId);
-                const nextRoles = matchesQuery(savedRole, query)
-                  ? roles.map((role) => (role.id === roleId ? savedRole : role))
-                  : roles.filter((role) => role.id !== roleId);
-
                 patchState(store, {
-                  data: [nextRoles, roleExists && !matchesQuery(savedRole, query) ? decrementTotal(total) : total],
-                  success: "Role updated."
+                  data: [roles.map((role) => (role.id === roleId ? savedRole : role)), total],
+                  success: 'Role updated.'
                 });
 
                 return;
               }
 
               patchState(store, {
-                data: matchesQuery(savedRole, query) ? [[savedRole, ...roles], total + 1] : [roles, total],
-                success: "Role created."
+                data: [[savedRole, ...roles], total + 1],
+                success: 'Role created.'
               });
             }),
             catchError((error: Error) => {
               patchState(store, {
-                error: getApiErrorMessage(
-                  error,
-                  roleId ? 'Unable to update the role' : 'Unable to create the role'
-                )
+                error: getApiErrorMessage(error, roleId ? 'Unable to update the role' : 'Unable to create the role')
               });
               return of(null);
             })

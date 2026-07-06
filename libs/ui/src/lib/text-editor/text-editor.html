@@ -1,0 +1,47 @@
+<div
+  class="text-editor-shell overflow-hidden rounded border border-neutral-200 shadow-sm dark:border-neutral-800"
+  [class.border-error]="invalid() || errors().length > 0"
+  [class.text-editor-disabled]="isDisabled()"
+  [class.opacity-70]="isDisabled()">
+  <div
+    class="text-editor-toolbar flex flex-wrap items-center gap-1 border-b border-neutral-200 px-2 py-2 dark:border-neutral-800">
+    @for (action of toolbarActions; track action.command) { @if (action.command === 'horizontalRule' || action.command
+    === 'undo') {
+    <mat-divider class="mx-1 hidden h-7 sm:block" vertical />
+    }
+
+    <button
+      matIconButton
+      type="button"
+      [attr.aria-label]="action.label"
+      [class.bg-primary-100]="isActionActive(action.command)"
+      [class.text-primary-700]="isActionActive(action.command)"
+      [disabled]="isDisabled()"
+      [matTooltip]="action.label"
+      (click)="applyAction(action.command)">
+      <mat-icon [svgIcon]="action.icon" />
+    </button>
+    }
+
+    <mat-divider class="mx-1 hidden h-7 sm:block" vertical />
+
+    <button
+      matIconButton
+      type="button"
+      aria-label="Code block"
+      [class.bg-primary-100]="isCodeBlockActive()"
+      [class.text-primary-700]="isCodeBlockActive()"
+      [disabled]="isDisabled()"
+      matTooltip="Code block"
+      (click)="toggleCodeBlock()">
+      <mat-icon svgIcon="code" />
+    </button>
+  </div>
+
+  <div
+    class="text-editor-content px-4 py-5 outline-none sm:px-8"
+    [id]="id()"
+    [style.max-height]="maxHeight()"
+    [style.min-height]="minHeight()"
+    #editorHost></div>
+</div>
