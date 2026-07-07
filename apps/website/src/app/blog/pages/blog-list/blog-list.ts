@@ -9,6 +9,7 @@ import { DEFAULT_LIMIT, IArticle } from '@libs/utils';
 import { ArticlesStore } from '../../data-access';
 import { ArticleCard } from '../../ui/article-card/article-card';
 import { Footer } from '@website/app/landing/ui/footer/footer';
+import { Loader } from '@libs/ui';
 
 @Component({
   selector: 'blog-list',
@@ -20,7 +21,8 @@ import { Footer } from '@website/app/landing/ui/footer/footer';
     MatPaginatorModule,
     MatProgressSpinnerModule,
     RouterLink,
-    Footer
+    Footer,
+    Loader
   ],
   templateUrl: './blog-list.html'
 })

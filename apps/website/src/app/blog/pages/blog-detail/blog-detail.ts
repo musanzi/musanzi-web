@@ -2,29 +2,18 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 import { Component, DestroyRef, computed, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
-import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ArticlesStore } from '../../data-access';
 import { ArticleContent } from '../../ui/article-content/article-content';
 import { getArticleCoverUrl } from '../../utils/article-cover-url';
 import { Footer } from '@website/app/landing/ui/footer/footer';
+import { Loader } from '@libs/ui';
 
 @Component({
   selector: 'blog-detail',
   providers: [ArticlesStore],
-  imports: [
-    ArticleContent,
-    DatePipe,
-    DecimalPipe,
-    MatButtonModule,
-    MatChipsModule,
-    MatIconModule,
-    MatProgressSpinnerModule,
-    RouterLink,
-    Footer
-  ],
+  imports: [ArticleContent, DatePipe, DecimalPipe, MatButtonModule, MatIconModule, RouterLink, Footer, Loader],
   templateUrl: './blog-detail.html'
 })
 export class BlogDetail {

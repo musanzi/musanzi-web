@@ -1,7 +1,5 @@
-import type { ITechnology } from './technology.interface';
+import type { ITool } from './tool.interface';
 
 export interface IService {
-  title: string;
-  summary: string;
-  skills: ITechnology[];
+  skills: ITool[];
 }

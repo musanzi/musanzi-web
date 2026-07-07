@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatIcon } from '@angular/material/icon';
-import { services } from '../../data';
+import { tools } from '../../data';
 
 @Component({
   selector: 'services',
-  imports: [MatIcon],
+  imports: [MatChipsModule, MatIcon],
   templateUrl: './services.html'
 })
 export class Services {
-  readonly services = services;
+  readonly tools = tools;
 }

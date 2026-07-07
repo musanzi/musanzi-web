@@ -1,4 +1,4 @@
-export interface ITechnology {
+export interface ITool {
   label: string;
   logo?: string;
 }

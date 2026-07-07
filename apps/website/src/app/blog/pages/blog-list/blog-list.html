@@ -9,15 +9,7 @@
 
   <div class="flex-1">
     @if (articlesStore.isLoading()) {
-    <section
-      class="grid min-h-72 place-items-center rounded-md border border-dashed border-gray-300 bg-gray-50"
-      aria-busy="true"
-      aria-label="Loading articles">
-      <div class="grid justify-items-center gap-4">
-        <mat-spinner diameter="42" />
-        <p class="text-base font-medium text-gray-600">Loading articles</p>
-      </div>
-    </section>
+    <ui-loader />
     } @else if (articlesStore.error()) {
     <section
       class="flex flex-col gap-3 rounded-md border border-red-200 bg-red-50 p-5 text-red-700 md:flex-row md:items-center"

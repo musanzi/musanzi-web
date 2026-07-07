@@ -7,9 +7,7 @@
   </header>
 
   @if (articlesStore.isLoading()) {
-  <section class="grid min-h-64 place-items-center" aria-busy="true" aria-label="Loading article">
-    <mat-spinner diameter="40" />
-  </section>
+  <ui-loader />
   } @else if (articlesStore.error()) {
   <section class="rounded-md border border-red-200 bg-red-50 p-5 text-red-700">{{ articlesStore.error() }}</section>
   } @else if (articlesStore.article(); as article) {
@@ -23,13 +21,14 @@
           <mat-icon class="size-4" svgIcon="eye" />
           {{ (article.viewsCount ?? 0) | number }}
         </span>
-        @if (article.tags.length) {
-        <mat-chip-set aria-label="Article tags">
-          @for (tag of article.tags; track tag.id) {
-          <mat-chip>{{ tag.name }}</mat-chip>
-          }
-        </mat-chip-set>
-        }
+        @if (article.tags.length) { @for (tag of article.tags; track tag.id) {
+        <div>
+          <span
+            class="flex items-center rounded-full bg-primary-400/10 px-3 py-1 text-xs font-medium leading-5 text-primary-600">
+            {{ tag.name }}
+          </span>
+        </div>
+        } }
       </div>
 
       <h1 class="mt-4 text-4xl leading-none font-bold text-gray-950 md:text-6xl">{{ article.title }}</h1>
