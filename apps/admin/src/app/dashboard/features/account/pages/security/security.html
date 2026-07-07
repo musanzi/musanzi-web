@@ -1,7 +1,7 @@
 <form class="grid grid-cols-1 gap-5" (submit)="save($event)">
   <div class="col-span-full">
     <div class="text-lg font-semibold">Change password</div>
-    <div class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+    <div class="mt-1 text-sm text-neutral-500">
       Choose a new password, then confirm it before saving.
     </div>
   </div>
@@ -28,12 +28,12 @@
 
   @if (authStore.success(); as message) {
   <div
-    class="col-span-full rounded border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700 dark:border-green-900/70 dark:bg-green-950/40 dark:text-green-300">
+    class="col-span-full rounded border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700">
     {{ message }}
   </div>
   } @if (authStore.error(); as error) {
   <div
-    class="col-span-full rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900/70 dark:bg-red-950/40 dark:text-red-300">
+    class="col-span-full rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
     {{ error }}
   </div>
   }

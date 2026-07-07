@@ -22,14 +22,14 @@ export const ProjectsStore = signalStore(
     total: computed(() => data()[1])
   })),
   withProps(() => ({
-    projectsService: inject(ProjectsService)
+    _projectsService: inject(ProjectsService)
   })),
-  withMethods(({ projectsService, ...store }) => ({
+  withMethods(({ _projectsService, ...store }) => ({
     loadProject: rxMethod<string>(
       pipe(
         tap(() => patchState(store, { error: null, isLoading: true, project: null })),
         exhaustMap((projectId) =>
-          projectsService.findOne(projectId).pipe(
+          _projectsService.findOne(projectId).pipe(
             tap((project) => patchState(store, { project })),
             catchError((error: Error) => {
               patchState(store, { error: getApiErrorMessage(error, 'Unable to load the project') });
@@ -44,7 +44,7 @@ export const ProjectsStore = signalStore(
       pipe(
         tap(() => patchState(store, { error: null, isLoading: true })),
         exhaustMap((query) =>
-          projectsService.findAll(query).pipe(
+          _projectsService.findAll(query).pipe(
             tap((data) => patchState(store, { data })),
             catchError(() => {
               patchState(store, { data: [[], 0] });
@@ -59,7 +59,7 @@ export const ProjectsStore = signalStore(
       pipe(
         tap(() => patchState(store, { error: null, success: null })),
         exhaustMap(({ projectId }) =>
-          projectsService.delete(projectId).pipe(
+          _projectsService.delete(projectId).pipe(
             tap(() => {
               const [projects, total] = store.data();
               const nextProjects = projects.filter((project) => project.id !== projectId);
@@ -81,12 +81,12 @@ export const ProjectsStore = signalStore(
       pipe(
         tap(() => patchState(store, { error: null, isSaving: true, success: null })),
         exhaustMap(({ image, payload, projectId }) => {
-          const request = projectId ? projectsService.update(projectId, payload) : projectsService.create(payload);
+          const request = projectId ? _projectsService.update(projectId, payload) : _projectsService.create(payload);
 
           return request.pipe(
             switchMap((savedProject) => {
               return image
-                ? projectsService.uploadImage(savedProject.id, image).pipe(
+                ? _projectsService.uploadImage(savedProject.id, image).pipe(
                     map((projectWithImage) => ({
                       project: projectWithImage,
                       uploadFailed: false

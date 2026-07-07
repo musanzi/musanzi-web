@@ -4,7 +4,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSidenav, MatSidenavContainer, MatSidenavContent } from '@angular/material/sidenav';
 import { RouterOutlet } from '@angular/router';
 import { Media } from '@libs/core';
-import { ThemeToggle } from '@libs/ui';
 import { AdminSidebar } from './ui/sidebar';
 
 @Component({
@@ -16,8 +15,7 @@ import { AdminSidebar } from './ui/sidebar';
     MatSidenavContainer,
     MatSidenav,
     MatSidenavContent,
-    AdminSidebar,
-    ThemeToggle
+    AdminSidebar
   ],
   templateUrl: './layout.html'
 })

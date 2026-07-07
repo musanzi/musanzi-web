@@ -1,23 +1,23 @@
 <section id="work-style" class="mb-14 scroll-mt-8 md:mb-22">
   <div class="flex items-center gap-2">
-    <p class="inline-flex items-center gap-2 text-base font-bold whitespace-nowrap text-gray-500 dark:text-gray-300">
+    <p class="inline-flex items-center gap-2 text-base font-bold whitespace-nowrap text-gray-500">
       <mat-icon class="size-4.5" svgIcon="list-checks" />
       Work Style
     </p>
-    <div class="h-px w-full bg-gray-300 dark:bg-gray-600"></div>
+    <div class="h-px w-full bg-gray-300"></div>
   </div>
-  <h2 class="mt-3 mb-6 max-w-[18ch] text-3xl leading-tight font-bold text-gray-950 md:text-4xl dark:text-gray-50">
+  <h2 class="mt-3 mb-6 max-w-[18ch] text-3xl leading-tight font-bold text-gray-950 md:text-4xl">
     How I approach delivery.
   </h2>
   <ol class="grid max-w-2xl">
     @for (principle of workPrinciples; track principle) {
     <li
-      class="relative grid grid-cols-[1.75rem_1fr] gap-3 pb-5 after:absolute after:top-7 after:bottom-0 after:left-3.5 after:w-px after:bg-gray-300 last:after:hidden dark:after:bg-gray-600">
+      class="relative grid grid-cols-[1.75rem_1fr] gap-3 pb-5 after:absolute after:top-7 after:bottom-0 after:left-3.5 after:w-px after:bg-gray-300 last:after:hidden">
       <span
-        class="relative z-10 flex size-7 items-center justify-center rounded-full border border-gray-300 bg-gray-50 text-[0.7rem] font-bold tabular-nums text-gray-700 dark:border-gray-600 dark:bg-zinc-800 dark:text-gray-100">
+        class="relative z-10 flex size-7 items-center justify-center rounded-full border border-gray-300 bg-gray-50 text-[0.7rem] font-bold tabular-nums text-gray-700">
         {{ $index + 1 }}
       </span>
-      <p class="text-lg leading-8 text-gray-600 dark:text-gray-300">{{ principle }}</p>
+      <p class="text-lg leading-8 text-gray-600">{{ principle }}</p>
     </li>
     }
   </ol>

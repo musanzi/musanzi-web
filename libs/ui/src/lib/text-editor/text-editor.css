@@ -1,0 +1,163 @@
+app-ui-text-editor {
+  display: block;
+}
+
+.text-editor-shell {
+  background: var(--mat-sys-surface-container-lowest);
+  color: var(--mat-sys-on-surface);
+  display: flex;
+  flex-direction: column;
+}
+
+.text-editor-toolbar {
+  background: var(--mat-sys-surface-container);
+  flex: 0 0 auto;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.text-editor-content {
+  overflow-y: auto;
+}
+
+.text-editor-disabled .text-editor-content {
+  background: var(--mat-sys-surface-container-high);
+}
+
+.text-editor-content :where(.ProseMirror) {
+  min-height: inherit;
+  color: inherit;
+  font-size: var(--text-md);
+  line-height: var(--leading-6);
+  outline: none !important;
+  outline-offset: 0 !important;
+}
+
+.text-editor-content :where(.ProseMirror:focus, .ProseMirror-focused) {
+  outline: none !important;
+}
+
+.text-editor-content :where(.ProseMirror > * + *) {
+  margin-top: 0.875rem;
+}
+
+.text-editor-content :where(.ProseMirror p.is-editor-empty:first-child::before) {
+  color: var(--mat-sys-on-surface-variant);
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.text-editor-content :where(.ProseMirror h1) {
+  font-size: var(--text-3xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--leading-8);
+}
+
+.text-editor-content :where(.ProseMirror h2) {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--leading-7);
+}
+
+.text-editor-content :where(.ProseMirror ul),
+.text-editor-content :where(.ProseMirror ol) {
+  padding-left: 1.5rem;
+}
+
+.text-editor-content :where(.ProseMirror ul) {
+  list-style: disc;
+}
+
+.text-editor-content :where(.ProseMirror ol) {
+  list-style: decimal;
+}
+
+.text-editor-content :where(.ProseMirror blockquote) {
+  border-left: 3px solid var(--mat-sys-outline-variant);
+  color: var(--mat-sys-on-surface-variant);
+  padding-left: 1rem;
+}
+
+.text-editor-content :where(.ProseMirror a) {
+  color: var(--mat-sys-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.text-editor-content :where(.ProseMirror code) {
+  border-radius: 0.25rem;
+  background: var(--mat-sys-surface-container-high);
+  color: var(--mat-sys-on-surface);
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  padding: 0.125rem 0.25rem;
+}
+
+.text-editor-content :where(.ProseMirror pre) {
+  overflow-x: auto;
+  border-radius: 0.5rem;
+  background: #282c34;
+  color: #abb2bf;
+  font-family: var(--font-mono);
+  margin: 1rem 0;
+  padding: 1rem;
+}
+
+.text-editor-content :where(.ProseMirror pre code) {
+  background: transparent;
+  color: inherit;
+  display: block;
+  font-size: var(--text-sm);
+  line-height: var(--leading-6);
+  padding: 0;
+}
+
+.text-editor-content :where(.hljs-comment, .hljs-quote) {
+  color: #5c6370;
+  font-style: italic;
+}
+
+.text-editor-content :where(.hljs-doctag, .hljs-keyword, .hljs-formula) {
+  color: #c678dd;
+}
+
+.text-editor-content :where(.hljs-section, .hljs-name, .hljs-selector-tag, .hljs-deletion, .hljs-subst) {
+  color: #e06c75;
+}
+
+.text-editor-content :where(.hljs-literal, .hljs-number) {
+  color: #d19a66;
+}
+
+.text-editor-content :where(.hljs-string, .hljs-regexp, .hljs-addition, .hljs-attribute, .hljs-meta-string) {
+  color: #98c379;
+}
+
+.text-editor-content :where(.hljs-built_in, .hljs-class .hljs-title) {
+  color: #e6c07b;
+}
+
+.text-editor-content
+  :where(.hljs-attr, .hljs-variable, .hljs-template-variable, .hljs-type, .hljs-selector-class, .hljs-selector-attr) {
+  color: #d19a66;
+}
+
+.text-editor-content :where(.hljs-symbol, .hljs-bullet, .hljs-link, .hljs-meta, .hljs-selector-id, .hljs-title) {
+  color: #61afef;
+}
+
+.text-editor-content :where(.hljs-emphasis) {
+  font-style: italic;
+}
+
+.text-editor-content :where(.hljs-strong) {
+  font-weight: var(--font-weight-semibold);
+}
+
+.text-editor-content :where(.text-editor-image) {
+  border-radius: 0.5rem;
+  max-width: 100%;
+}

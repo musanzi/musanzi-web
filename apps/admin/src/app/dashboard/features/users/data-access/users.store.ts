@@ -22,74 +22,70 @@ export const UsersStore = signalStore(
   withProps(() => ({
     usersService: inject(UsersService)
   })),
-  withMethods(({ usersService, ...store }) => {
-    const loadUsers = rxMethod<IUserQuery>(
+  withMethods(({ usersService, ...store }) => ({
+    loadUsers: rxMethod<IUserQuery>(
       pipe(
         tap(() => patchState(store, { error: null, isLoading: true })),
         exhaustMap((query) =>
           usersService.findAll(query).pipe(
             tap((data) => patchState(store, { data })),
-            catchError((error: Error) => {
-              patchState(store, { error: getApiErrorMessage(error, 'Unable to load users') });
+            catchError(() => {
               return of(null);
             }),
             finalize(() => patchState(store, { isLoading: false }))
           )
         )
       )
-    );
-    return {
-      loadUsers,
-      deleteUser: rxMethod<IDeleteUserPayload>(
-        pipe(
-          tap(() => patchState(store, { error: null, success: null })),
-          exhaustMap(({ userId }) =>
-            usersService.delete(userId).pipe(
-              tap(() => {
-                const [users, total] = store.data();
-                const nextUsers = users.filter((user) => user.id !== userId);
+    ),
+    deleteUser: rxMethod<IDeleteUserPayload>(
+      pipe(
+        tap(() => patchState(store, { error: null, success: null })),
+        exhaustMap(({ userId }) =>
+          usersService.delete(userId).pipe(
+            tap(() => {
+              const [users, total] = store.data();
+              const nextUsers = users.filter((user) => user.id !== userId);
 
-                patchState(store, {
-                  data: [nextUsers, total - 1],
-                  success: 'User deleted.'
-                });
-              }),
-              catchError((error: Error) => {
-                patchState(store, {
-                  error: getApiErrorMessage(error, 'Unable to delete the user')
-                });
-                return of(null);
-              })
-            )
+              patchState(store, {
+                data: [nextUsers, total - 1],
+                success: 'User deleted.'
+              });
+            }),
+            catchError((error: Error) => {
+              patchState(store, {
+                error: getApiErrorMessage(error, 'Unable to delete the user')
+              });
+              return of(null);
+            })
           )
         )
-      ),
-      updatedUser: rxMethod<{ userId: string; payload: IUserPayload }>(
-        pipe(
-          tap(() => patchState(store, { error: null, success: null })),
-          exhaustMap(({ userId, payload }) => {
-            return usersService.update(userId, payload).pipe(
-              map((savedUser) => {
-                const [users, total] = store.data();
+      )
+    ),
+    updatedUser: rxMethod<{ userId: string; payload: IUserPayload }>(
+      pipe(
+        tap(() => patchState(store, { error: null, success: null })),
+        exhaustMap(({ userId, payload }) => {
+          return usersService.update(userId, payload).pipe(
+            map((savedUser) => {
+              const [users, total] = store.data();
 
-                patchState(store, {
-                  data: [users.map((user) => (user.id === userId ? savedUser : user)), total],
-                  success: 'User updated.'
-                });
-              }),
-              catchError((error: Error) => {
-                patchState(store, {
-                  error: getApiErrorMessage(error)
-                });
-                return of(null);
-              })
-            );
-          })
-        )
-      ),
-      clearMessages(): void {
-        patchState(store, { error: null, success: null });
-      }
-    };
-  })
+              patchState(store, {
+                data: [users.map((user) => (user.id === userId ? savedUser : user)), total],
+                success: 'User updated.'
+              });
+            }),
+            catchError((error: Error) => {
+              patchState(store, {
+                error: getApiErrorMessage(error)
+              });
+              return of(null);
+            })
+          );
+        })
+      )
+    ),
+    clearMessages(): void {
+      patchState(store, { error: null, success: null });
+    }
+  }))
 );

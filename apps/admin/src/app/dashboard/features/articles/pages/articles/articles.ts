@@ -51,7 +51,7 @@ export class Articles {
   private readonly snackBar = inject(MatSnackBar);
 
   protected readonly articlesStore = inject(ArticlesStore);
-  protected readonly displayedColumns = ['article', 'status', 'tags', 'publishedAt', 'updatedAt', 'actions'];
+  protected readonly displayedColumns = ['article', 'status', 'viewsCount', 'publishedAt', 'updatedAt', 'actions'];
   protected readonly query = {
     limit: DEFAULT_LIMIT,
     page: 1,

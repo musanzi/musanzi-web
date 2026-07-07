@@ -16,10 +16,10 @@
   @if (projectsStore.isLoading()) {
   <mat-card appearance="filled" aria-busy="true" aria-label="Loading project form">
     <mat-card-content class="grid gap-6 p-6">
-      <div class="h-8 w-48 animate-pulse rounded-full bg-neutral-300 dark:bg-neutral-600"></div>
-      <div class="h-14 animate-pulse rounded bg-neutral-200 dark:bg-neutral-700"></div>
-      <div class="h-32 animate-pulse rounded bg-neutral-200 dark:bg-neutral-700"></div>
-      <div class="h-24 animate-pulse rounded bg-neutral-200 dark:bg-neutral-700"></div>
+      <div class="h-8 w-48 animate-pulse rounded-full bg-neutral-300"></div>
+      <div class="h-14 animate-pulse rounded bg-neutral-200"></div>
+      <div class="h-32 animate-pulse rounded bg-neutral-200"></div>
+      <div class="h-24 animate-pulse rounded bg-neutral-200"></div>
     </mat-card-content>
   </mat-card>
   } @else {
@@ -81,14 +81,14 @@
 
           @if (projectModel().links.length === 0) {
           <div
-            class="rounded border border-dashed border-neutral-300 px-4 py-6 text-center text-sm text-on-surface-variant dark:border-neutral-700">
+            class="rounded border border-dashed border-neutral-300 px-4 py-6 text-center text-sm text-on-surface-variant">
             No links added.
           </div>
           } @else {
           <div class="grid gap-3">
             @for (link of projectModel().links; track trackLink($index)) {
             <div
-              class="grid gap-3 rounded border border-neutral-200 bg-white p-3 dark:border-neutral-800 dark:bg-neutral-900 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)_2.5rem] md:items-start">
+              class="grid gap-3 rounded border border-neutral-200 bg-white p-3 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)_2.5rem] md:items-start">
               <mat-form-field>
                 <mat-label>Label</mat-label>
                 <input
@@ -142,7 +142,7 @@
 
         <mat-card-content class="grid gap-4">
           <div
-            class="flex aspect-video items-center justify-center overflow-hidden rounded border border-neutral-200 bg-neutral-100 text-neutral-500 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-400">
+            class="flex aspect-video items-center justify-center overflow-hidden rounded border border-neutral-200 bg-neutral-100 text-neutral-500">
             @if (displayImageUrl(); as imageUrl) {
             <img class="size-full object-cover" [src]="imageUrl" alt="Project preview" />
             } @else {

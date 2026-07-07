@@ -1,6 +1,6 @@
 <mat-sidenav-container>
   <mat-sidenav
-    class="w-70 border-r border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900"
+    class="w-70 border-r border-neutral-200 bg-white"
     [mode]="isMobile() ? 'over' : 'side'"
     [opened]="!isMobile()"
     [disableClose]="!isMobile()"
@@ -17,9 +17,6 @@
       <!-- Spacer -->
       <div class="flex-auto"></div>
 
-      <div class="flex items-center gap-x-2">
-        <ui-theme-toggle />
-      </div>
     </div>
     <!-- Content -->
     <router-outlet />

@@ -29,11 +29,13 @@ import { IUser } from '@libs/utils';
     </button>
 
     <mat-menu class="min-w-60" xPosition="before" yPosition="above" #userMenu="matMenu">
+      @if (showAppearance()) {
       <button mat-menu-item [matMenuTriggerFor]="appearanceMenu">
         <mat-icon svgIcon="sun-moon" />
         {{ appearanceLabel() }}
       </button>
       <mat-divider />
+      }
       <button mat-menu-item (click)="handleSignOut()">
         <mat-icon svgIcon="log-out" />
         {{ signOutLabel() }}
@@ -58,6 +60,7 @@ export class User {
   avatarUrl = input.required<string | null>();
   signOut = output();
   appearanceLabel = input('Apparence');
+  showAppearance = input(true);
   signOutLabel = input('Se déconnecter');
   schemeLabels = input({
     dark: 'Sombre',

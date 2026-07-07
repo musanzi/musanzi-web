@@ -1,0 +1,168 @@
+.article-content {
+  color: var(--mat-sys-on-surface);
+}
+
+.article-content :where(.ProseMirror) {
+  color: inherit;
+  font-size: var(--text-md);
+  line-height: var(--leading-6);
+  outline: none !important;
+  outline-offset: 0 !important;
+}
+
+.article-content :where(.ProseMirror > * + *) {
+  margin-top: 0.875rem;
+}
+
+.article-content :where(li + li) {
+  margin-top: 0.375rem;
+}
+
+.article-content :where(li > :first-child) {
+  margin-top: 0;
+}
+
+.article-content :where(h1) {
+  font-size: var(--text-3xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--leading-8);
+}
+
+.article-content :where(h2) {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--leading-7);
+}
+
+.article-content :where(h3) {
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--leading-7);
+}
+
+.article-content :where(p) {
+  font-size: 0.94rem;
+  overflow-wrap: anywhere;
+}
+
+.article-content :where(.article-content-align-center) {
+  text-align: center;
+}
+
+.article-content :where(.article-content-align-right) {
+  text-align: right;
+}
+
+.article-content :where(.article-content-align-justify) {
+  text-align: justify;
+}
+
+.article-content :where(ul),
+.article-content :where(ol) {
+  padding-left: 1.5rem;
+}
+
+.article-content :where(ul) {
+  list-style: disc;
+}
+
+.article-content :where(ol) {
+  list-style: decimal;
+}
+
+.article-content :where(blockquote) {
+  border-left: 3px solid var(--mat-sys-outline-variant);
+  color: var(--mat-sys-on-surface-variant);
+  padding-left: 1rem;
+}
+
+.article-content :where(blockquote > :first-child) {
+  margin-top: 0;
+}
+
+.article-content :where(hr) {
+  border: 0;
+  border-top: 1px solid var(--mat-sys-outline-variant);
+  margin-block: 2rem;
+}
+
+.article-content :where(a) {
+  color: var(--mat-sys-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.article-content :where(code) {
+  border-radius: 0.25rem;
+  background: var(--mat-sys-surface-container-high);
+  color: var(--mat-sys-on-surface);
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  padding: 0.125rem 0.25rem;
+}
+
+.article-content :where(pre) {
+  overflow-x: auto;
+  border-radius: 0.5rem;
+  background: #282c34;
+  color: #abb2bf;
+  font-family: var(--font-mono);
+  margin: 1rem 0;
+  padding: 1rem;
+}
+
+.article-content :where(pre code) {
+  background: transparent;
+  color: inherit;
+  display: block;
+  font-size: var(--text-sm);
+  line-height: var(--leading-6);
+  padding: 0;
+}
+
+.article-content :where(.hljs-comment, .hljs-quote) {
+  color: #5c6370;
+  font-style: italic;
+}
+
+.article-content :where(.hljs-doctag, .hljs-keyword, .hljs-formula) {
+  color: #c678dd;
+}
+
+.article-content :where(.hljs-section, .hljs-name, .hljs-selector-tag, .hljs-deletion, .hljs-subst) {
+  color: #e06c75;
+}
+
+.article-content :where(.hljs-literal, .hljs-number) {
+  color: #d19a66;
+}
+
+.article-content :where(.hljs-string, .hljs-regexp, .hljs-addition, .hljs-attribute, .hljs-meta-string) {
+  color: #98c379;
+}
+
+.article-content :where(.hljs-built_in, .hljs-class .hljs-title) {
+  color: #e6c07b;
+}
+
+.article-content
+  :where(.hljs-attr, .hljs-variable, .hljs-template-variable, .hljs-type, .hljs-selector-class, .hljs-selector-attr) {
+  color: #d19a66;
+}
+
+.article-content :where(.hljs-symbol, .hljs-bullet, .hljs-link, .hljs-meta, .hljs-selector-id, .hljs-title) {
+  color: #61afef;
+}
+
+.article-content :where(.hljs-emphasis) {
+  font-style: italic;
+}
+
+.article-content :where(.hljs-strong) {
+  font-weight: var(--font-weight-semibold);
+}
+
+.article-content :where(.text-editor-image, img) {
+  border-radius: 0.5rem;
+  max-width: 100%;
+}

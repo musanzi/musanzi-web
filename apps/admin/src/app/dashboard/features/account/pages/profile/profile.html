@@ -1,14 +1,14 @@
 <form class="grid grid-cols-1 gap-5" (submit)="save($event)">
   <div class="col-span-full">
     <div class="text-lg font-semibold">Account information</div>
-    <div class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+    <div class="mt-1 text-sm text-neutral-500">
       Update the photo, name, and email address associated with your account.
     </div>
   </div>
 
   <div class="col-span-full flex flex-col gap-4 sm:flex-row sm:items-center">
     <div
-      class="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-full border border-neutral-200 bg-neutral-100 text-neutral-500 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-400">
+      class="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-full border border-neutral-200 bg-neutral-100 text-neutral-500">
       @if (avatarUrl(); as avatar) {
       <img class="h-full w-full object-cover" [src]="avatar" alt="Profile photo" />
       } @else {
@@ -18,7 +18,7 @@
 
     <div class="min-w-0">
       <div class="text-sm font-medium">Profile photo</div>
-      <div class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+      <div class="mt-1 text-sm text-neutral-500">
         JPG, PNG, WebP, or GIF. 2 MB maximum.
       </div>
       <input
@@ -59,12 +59,12 @@
 
   @if (authStore.success(); as message) {
   <div
-    class="col-span-full rounded border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700 dark:border-green-900/70 dark:bg-green-950/40 dark:text-green-300">
+    class="col-span-full rounded border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700">
     {{ message }}
   </div>
   } @if (authStore.error(); as error) {
   <div
-    class="col-span-full rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900/70 dark:bg-red-950/40 dark:text-red-300">
+    class="col-span-full rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
     {{ error }}
   </div>
   }

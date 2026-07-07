@@ -1,10 +1,10 @@
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { ApplicationConfig, LOCALE_ID, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ApplicationConfig, inject, LOCALE_ID, provideAppInitializer, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { provideClientHydration } from '@angular/platform-browser';
 import { provideRouter, TitleStrategy, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
-import { provideIcons, provideTheming } from '@libs/core';
+import { provideIcons, provideTheming, Theming } from '@libs/core';
 import { provideApp } from './app.provider';
 import { routes } from './app.routes';
 import { httpInterceptor, PageTitleStrategy } from './core';
@@ -26,9 +26,12 @@ export const appConfig: ApplicationConfig = {
     provideNativeDateAdapter(),
     provideIcons(),
     provideTheming({
-      scheme: 'system',
+      scheme: 'light',
       primary: '#1565C0',
       error: '#dc2626'
+    }),
+    provideAppInitializer(() => {
+      inject(Theming).scheme.set('light');
     }),
     provideApp()
   ]

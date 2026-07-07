@@ -22,14 +22,14 @@ export const ArticlesStore = signalStore(
     total: computed(() => data()[1])
   })),
   withProps(() => ({
-    articlesService: inject(ArticlesService)
+    _articlesService: inject(ArticlesService)
   })),
-  withMethods(({ articlesService, ...store }) => ({
+  withMethods(({ _articlesService, ...store }) => ({
     loadArticle: rxMethod<string>(
       pipe(
         tap(() => patchState(store, { article: null, error: null, isLoading: true })),
         exhaustMap((articleId) =>
-          articlesService.findOne(articleId).pipe(
+          _articlesService.findOne(articleId).pipe(
             tap((article) => patchState(store, { article })),
             catchError((error: Error) => {
               patchState(store, { error: getApiErrorMessage(error, 'Unable to load the article') });
@@ -44,7 +44,7 @@ export const ArticlesStore = signalStore(
       pipe(
         tap(() => patchState(store, { error: null, isLoading: true })),
         exhaustMap((query) =>
-          articlesService.findAll(query).pipe(
+          _articlesService.findAll(query).pipe(
             tap((data) => patchState(store, { data })),
             catchError(() => {
               patchState(store, { data: [[], 0] });
@@ -59,7 +59,7 @@ export const ArticlesStore = signalStore(
       pipe(
         tap(() => patchState(store, { error: null, success: null })),
         exhaustMap(({ articleId }) =>
-          articlesService.delete(articleId).pipe(
+          _articlesService.delete(articleId).pipe(
             tap(() => {
               const [articles, total] = store.data();
               const nextArticles = articles.filter((article) => article.id !== articleId);
@@ -81,12 +81,12 @@ export const ArticlesStore = signalStore(
       pipe(
         tap(() => patchState(store, { error: null, isSaving: true, success: null })),
         exhaustMap(({ articleId, cover, payload }) => {
-          const request = articleId ? articlesService.update(articleId, payload) : articlesService.create(payload);
+          const request = articleId ? _articlesService.update(articleId, payload) : _articlesService.create(payload);
 
           return request.pipe(
             switchMap((savedArticle) => {
               return cover
-                ? articlesService.uploadCover(savedArticle.id, cover).pipe(
+                ? _articlesService.uploadCover(savedArticle.id, cover).pipe(
                     map((articleWithCover) => ({
                       article: articleWithCover,
                       uploadFailed: false

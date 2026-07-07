@@ -7,6 +7,7 @@ export interface IArticle {
   summary: string;
   content?: string;
   cover: string | null;
+  viewsCount: number;
   publishedAt: string | null;
   tags: ITag[];
   createdAt: string;

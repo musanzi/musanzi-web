@@ -1,5 +1,4 @@
 import { computed, inject } from '@angular/core';
-import { getApiErrorMessage } from '@libs/utils';
 import { patchState, signalStore, withComputed, withMethods, withProps, withState } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { catchError, exhaustMap, finalize, of, pipe, tap } from 'rxjs';
@@ -20,9 +19,9 @@ export const ArticlesStore = signalStore(
     total: computed(() => data()[1])
   })),
   withProps(() => ({
-    articlesService: inject(ArticlesService)
+    _articlesService: inject(ArticlesService)
   })),
-  withMethods(({ articlesService, ...store }) => ({
+  withMethods(({ _articlesService, ...store }) => ({
     clearError(): void {
       patchState(store, { error: null });
     },
@@ -30,10 +29,9 @@ export const ArticlesStore = signalStore(
       pipe(
         tap(() => patchState(store, { article: null, error: null, isLoading: true })),
         exhaustMap((slug) =>
-          articlesService.findOne(slug).pipe(
+          _articlesService.findOne(slug).pipe(
             tap((article) => patchState(store, { article })),
-            catchError((error: Error) => {
-              patchState(store, { error: getApiErrorMessage(error, 'Unable to load the article') });
+            catchError(() => {
               return of(null);
             }),
             finalize(() => patchState(store, { isLoading: false }))
@@ -45,13 +43,9 @@ export const ArticlesStore = signalStore(
       pipe(
         tap(() => patchState(store, { error: null, isLoading: true })),
         exhaustMap((query) =>
-          articlesService.findAll(query).pipe(
+          _articlesService.findAll(query).pipe(
             tap((data) => patchState(store, { data })),
-            catchError((error: Error) => {
-              patchState(store, {
-                data: [[], 0],
-                error: getApiErrorMessage(error, 'Unable to load articles')
-              });
+            catchError(() => {
               return of(null);
             }),
             finalize(() => patchState(store, { isLoading: false }))

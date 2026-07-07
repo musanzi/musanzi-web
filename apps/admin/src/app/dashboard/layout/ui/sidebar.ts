@@ -23,13 +23,8 @@ import { getProfileAvatarUrl } from '../../utils';
       class="mx-4 mb-4"
       [user]="authStore.user()"
       [avatarUrl]="avatarUrl()"
-      appearanceLabel="Appearance"
+      [showAppearance]="false"
       signOutLabel="Sign out"
-      [schemeLabels]="{
-        light: 'Light',
-        dark: 'Dark',
-        system: 'System'
-      }"
       (signOut)="authStore.signOut()" />
   `
 })

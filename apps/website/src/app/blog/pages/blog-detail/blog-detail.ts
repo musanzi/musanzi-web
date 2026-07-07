@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import { Component, DestroyRef, computed, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,6 +16,7 @@ import { getArticleCoverUrl } from '../../utils/article-cover-url';
   imports: [
     ArticleContent,
     DatePipe,
+    DecimalPipe,
     MatButtonModule,
     MatChipsModule,
     MatIconModule,
