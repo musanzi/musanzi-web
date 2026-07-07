@@ -17,4 +17,8 @@ export class ArticleCard {
   readonly article = input.required<IArticle>();
 
   protected readonly coverUrl = computed(() => getArticleCoverUrl(this.article().cover));
+  protected readonly displayedTags = computed(() => this.article().tags.slice(0, 3));
+  protected readonly hiddenTagsCount = computed(() =>
+    Math.max(this.article().tags.length - this.displayedTags().length, 0)
+  );
 }

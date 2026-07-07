@@ -19,13 +19,7 @@ import { getProfileAvatarUrl } from '../../utils';
 
     <ui-dashboard-navigation class="mt-8 mb-4 flex-auto" [navItems]="navItems()" />
 
-    <ui-user
-      class="mx-4 mb-4"
-      [user]="authStore.user()"
-      [avatarUrl]="avatarUrl()"
-      [showAppearance]="false"
-      signOutLabel="Sign out"
-      (signOut)="authStore.signOut()" />
+    <ui-user class="mx-4 mb-4" [user]="authStore.user()" [avatarUrl]="avatarUrl()" (signOut)="authStore.signOut()" />
   `
 })
 export class AdminSidebar {

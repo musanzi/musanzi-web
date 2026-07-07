@@ -8,6 +8,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DEFAULT_LIMIT, IArticle } from '@libs/utils';
 import { ArticlesStore } from '../../data-access';
 import { ArticleCard } from '../../ui/article-card/article-card';
+import { Footer } from '@website/app/landing/ui/footer/footer';
 
 @Component({
   selector: 'blog-list',
@@ -18,7 +19,8 @@ import { ArticleCard } from '../../ui/article-card/article-card';
     MatIconModule,
     MatPaginatorModule,
     MatProgressSpinnerModule,
-    RouterLink
+    RouterLink,
+    Footer
   ],
   templateUrl: './blog-list.html'
 })

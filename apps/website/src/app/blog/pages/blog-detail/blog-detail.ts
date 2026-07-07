@@ -9,6 +9,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ArticlesStore } from '../../data-access';
 import { ArticleContent } from '../../ui/article-content/article-content';
 import { getArticleCoverUrl } from '../../utils/article-cover-url';
+import { Footer } from '@website/app/landing/ui/footer/footer';
 
 @Component({
   selector: 'blog-detail',
@@ -21,7 +22,8 @@ import { getArticleCoverUrl } from '../../utils/article-cover-url';
     MatChipsModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    RouterLink
+    RouterLink,
+    Footer
   ],
   templateUrl: './blog-detail.html'
 })
