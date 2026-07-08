@@ -1,6 +1,6 @@
 services:
   website:
-    container_name: musanzi-admin
+    container_name: musanzi-website
     environment:
       - PORT=4200
     build:
