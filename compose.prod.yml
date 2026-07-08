@@ -1,6 +1,8 @@
 services:
   website:
     container_name: musanzi-admin
+    environment:
+      - PORT=4200
     build:
       context: .
       target: production
@@ -11,6 +13,8 @@ services:
 
   admin:
     container_name: musanzi-admin
+    environment:
+      - PORT=4300
     build:
       context: .
       target: production
