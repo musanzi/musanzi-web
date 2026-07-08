@@ -40,9 +40,6 @@ jobs:
       - name: Lint apps
         run: pnpm lint
 
-      - name: Build apps
-        run: pnpm build
-
   deploy:
     name: Deploy to VPS
     runs-on: ubuntu-latest
