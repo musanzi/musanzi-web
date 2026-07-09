@@ -1,6 +1,5 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { Component, computed, input } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
 import { MatCard, MatCardContent } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
@@ -9,7 +8,7 @@ import { getArticleCoverUrl } from '../../utils/article-cover-url';
 
 @Component({
   selector: 'blog-article-card',
-  imports: [DatePipe, DecimalPipe, MatButtonModule, MatCard, MatCardContent, MatIconModule, RouterLink],
+  imports: [DatePipe, DecimalPipe, MatCard, MatCardContent, MatIconModule, RouterLink],
   templateUrl: './article-card.html'
 })
 export class ArticleCard {

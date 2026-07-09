@@ -1,4 +1,6 @@
-<mat-card appearance="outlined" class="group overflow-hidden border-gray-200 bg-white transition duration-200">
+<mat-card
+  appearance="outlined"
+  class="group relative overflow-hidden border-gray-200 bg-white transition duration-200 hover:border-gray-300 hover:shadow-sm hover:shadow-gray-950/5">
   <mat-card-content class="grid gap-0 p-0 lg:grid-cols-[minmax(0,1fr)_22rem]">
     <div class="flex min-h-full flex-col gap-6 p-5 md:p-7">
       <div class="flex flex-wrap items-center gap-3 text-sm font-medium text-gray-500">
@@ -17,7 +19,13 @@
       </div>
 
       <div class="grid gap-3">
-        <h2 class="max-w-3xl text-2xl leading-tight font-semibold text-gray-950">{{ article().title }}</h2>
+        <h2 class="max-w-3xl text-2xl leading-tight font-semibold text-gray-950">
+          <a
+            class="rounded-xs after:absolute after:inset-0 focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 focus-visible:outline-none"
+            [routerLink]="['/blog', article().slug]">
+            {{ article().title }}
+          </a>
+        </h2>
 
         <p class="max-w-2xl text-base leading-6 text-gray-600 md:text-lg">{{ article().summary }}</p>
       </div>
@@ -33,14 +41,15 @@
           }
         </div>
 
-        <a matButton="outlined" [routerLink]="['/blog', article().slug]">
+        <span
+          class="inline-flex items-center gap-1.5 text-sm font-medium text-gray-700 transition group-hover:gap-2.5 group-hover:text-gray-950">
           Read article
-          <mat-icon svgIcon="arrow-up-right" />
-        </a>
+          <mat-icon class="size-4" svgIcon="arrow-up-right" />
+        </span>
       </div>
     </div>
 
-    <div class="relative min-h-56 overflow-hidden bg-gray-950 lg:min-h-full">
+    <div class="relative order-first min-h-56 overflow-hidden bg-gray-950 lg:order-0 lg:min-h-full">
       @if (coverUrl(); as cover) {
       <img
         class="absolute inset-0 size-full object-cover opacity-90 transition duration-500 group-hover:scale-105 group-hover:opacity-100"

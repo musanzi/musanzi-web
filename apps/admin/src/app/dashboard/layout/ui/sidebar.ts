@@ -8,13 +8,11 @@ import { getProfileAvatarUrl } from '../../utils';
   selector: 'admin-sidebar',
   imports: [DashboardNavigation, User],
   host: {
-    class: 'flex w-full flex-auto flex-col'
+    class: 'flex w-full flex-auto flex-col text-white'
   },
   template: `
     <div class="relative flex items-center gap-x-2.5 pt-5 pr-4 pb-0 pl-6">
-      <div class="flex flex-col">
-        <div class="text-on-surface text-lg leading-none font-bold tracking-wider">ADMIN - MUSANZI</div>
-      </div>
+      <img src="/favicon.svg" alt="Musanzi" class="size-10 rounded-lg" />
     </div>
 
     <ui-dashboard-navigation class="mt-8 mb-4 flex-auto" [navItems]="navItems()" />

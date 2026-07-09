@@ -39,8 +39,8 @@ import { filter, take } from 'rxjs';
               <a
                 cdkMonitorElementFocus
                 ngTreeItem
-                routerLinkActive="bg-neutral-700/10 dark:bg-neutral-300/10"
-                class="navigation-item flex cursor-pointer items-center gap-x-2 rounded-lg px-2.5 py-2 select-none hover:bg-neutral-700/10 dark:hover:bg-neutral-300/10"
+                routerLinkActive="bg-primary-800/60"
+                class="navigation-item flex cursor-pointer items-center gap-x-2 rounded-lg px-2.5 py-2 select-none hover:bg-primary-800/60"
                 [parent]="parent"
                 [value]="node.id"
                 [label]="node.label"
