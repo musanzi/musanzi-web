@@ -157,7 +157,7 @@
     color: var(--tw-prose-headings) !important;
     font-size: var(--text-4xl) !important;
     font-weight: var(--font-weight-semibold) !important;
-    line-height: var(--leading-8) !important;
+    line-height: var(--leading-7) !important;
     margin-block-end: --spacing(2) !important;
   }
 
@@ -396,11 +396,11 @@
 
 @utility prose-lg {
   font-size: var(--text-xl) !important;
-  line-height: var(--leading-8) !important;
+  line-height: var(--leading-7) !important;
 
   :where([class~='lead']):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
     font-size: var(--text-3xl) !important;
-    line-height: var(--leading-8) !important;
+    line-height: var(--leading-7) !important;
   }
 
   :where(h1):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
@@ -412,7 +412,7 @@
   :where(h2):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
     font-size: var(--text-4xl) !important;
     font-weight: var(--font-weight-semibold) !important;
-    line-height: var(--leading-8) !important;
+    line-height: var(--leading-7) !important;
     margin-block-end: --spacing(4) !important;
   }
 

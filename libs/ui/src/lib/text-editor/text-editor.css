@@ -53,7 +53,7 @@ app-ui-text-editor {
 .text-editor-content :where(.ProseMirror h1) {
   font-size: var(--text-3xl);
   font-weight: var(--font-weight-semibold);
-  line-height: var(--leading-8);
+  line-height: var(--leading-7);
 }
 
 .text-editor-content :where(.ProseMirror h2) {

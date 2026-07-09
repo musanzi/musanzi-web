@@ -25,7 +25,7 @@
 .article-content :where(h1) {
   font-size: var(--text-3xl);
   font-weight: var(--font-weight-semibold);
-  line-height: var(--leading-8);
+  line-height: var(--leading-7);
 }
 
 .article-content :where(h2) {

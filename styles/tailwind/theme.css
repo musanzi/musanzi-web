@@ -29,7 +29,7 @@
   --leading-5: 1.25rem; /* 20px */
   --leading-6: 1.5rem; /* 24px */
   --leading-7: 1.75rem; /* 28px */
-  --leading-8: 2rem; /* 32px */
+  --leading-7: 2rem; /* 32px */
   --leading-9: 2.25rem; /* 36px */
   --leading-10: 2.5rem; /* 40px */
 
@@ -88,7 +88,7 @@
   --text-2xl--letter-spacing: var(--tracking-normal);
 
   --text-3xl: 1.5rem; /* 24px */
-  --text-3xl--line-height: var(--leading-8);
+  --text-3xl--line-height: var(--leading-7);
   --text-3xl--font-weight: var(--font-weight-normal);
   --text-3xl--letter-spacing: var(--tracking-normal);
 
