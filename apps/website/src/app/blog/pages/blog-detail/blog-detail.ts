@@ -1,35 +1,30 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { Component, DestroyRef, computed, inject } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { ArticlesStore } from '../../data-access';
 import { ArticleContent } from '../../ui/article-content/article-content';
 import { getArticleCoverUrl } from '../../utils/article-cover-url';
 import { Footer } from '@website/app/landing/ui/footer/footer';
 import { Loader } from '@libs/ui';
+import { httpResource } from '@angular/common/http';
+import { IArticle } from '@libs/utils';
 
 @Component({
   selector: 'blog-detail',
-  providers: [ArticlesStore],
   imports: [ArticleContent, DatePipe, DecimalPipe, MatButtonModule, MatIconModule, RouterLink, Footer, Loader],
   templateUrl: './blog-detail.html'
 })
 export class BlogDetail {
-  private readonly destroyRef = inject(DestroyRef);
   private readonly route = inject(ActivatedRoute);
 
-  protected readonly articlesStore = inject(ArticlesStore);
-  protected readonly coverUrl = computed(() => getArticleCoverUrl(this.articlesStore.article()?.cover ?? null));
+  private readonly slug = signal(this.route.snapshot.paramMap.get('slug'));
 
-  constructor() {
-    this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
-      const slug = params.get('slug');
+  readonly article = httpResource<IArticle>(() => `/articles/${this.slug()}`);
 
-      if (slug) {
-        this.articlesStore.loadArticle(slug);
-      }
-    });
-  }
+  protected readonly coverUrl = computed(() => {
+    if (this.article.hasValue()) {
+      return getArticleCoverUrl(this.article.value().cover);
+    }
+  });
 }

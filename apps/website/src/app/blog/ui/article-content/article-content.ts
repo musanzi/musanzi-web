@@ -58,7 +58,10 @@ export class ArticleContent {
 
   private getLowlightClassNames(className: unknown): string {
     if (Array.isArray(className)) {
-      return className.filter((value): value is string => typeof value === 'string').map((value) => this.escapeAttribute(value)).join(' ');
+      return className
+        .filter((value): value is string => typeof value === 'string')
+        .map((value) => this.escapeAttribute(value))
+        .join(' ');
     }
 
     return typeof className === 'string' ? this.escapeAttribute(className) : '';
@@ -69,9 +72,6 @@ export class ArticleContent {
   }
 
   private escapeHtml(value: string): string {
-    return value
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
+    return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 }

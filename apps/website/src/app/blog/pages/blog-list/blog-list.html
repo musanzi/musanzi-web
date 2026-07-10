@@ -8,33 +8,33 @@
   </header>
 
   <div class="flex-1">
-    @if (articlesStore.isLoading()) {
+    @if (articlesRessource.isLoading()) {
     <ui-loader />
-    } @else if (articlesStore.error()) {
+    } @else if (articlesRessource.error()) {
     <section
       class="flex flex-col gap-3 rounded-md border border-red-200 bg-red-50 p-5 text-red-700 md:flex-row md:items-center"
       role="alert">
       <mat-icon class="shrink-0" svgIcon="triangle-alert" />
-      <p class="leading-7">{{ articlesStore.error() }}</p>
+      <p class="leading-7">{{ articlesRessource.error() }}</p>
     </section>
-    } @else if (articlesStore.articles().length) {
+    } @else if (articlesRessource.hasValue()) {
     <section class="mb-6 flex items-center gap-4" aria-label="Article list summary">
       <h2 class="text-sm font-bold tracking-normal text-gray-500 uppercase">Latest writing</h2>
       <div class="h-px flex-1 bg-gray-200"></div>
-      <p class="text-sm font-medium text-gray-500">Page {{ page }}</p>
+      <p class="text-sm font-medium text-gray-500">Page {{ page() }}</p>
     </section>
 
     <section class="grid gap-6" aria-label="Articles">
-      @for (article of articlesStore.articles(); track trackBy($index, article)) {
+      @for (article of articles(); track article.id) {
       <blog-article-card [article]="article" />
       }
     </section>
 
-    @if(articlesStore.articles().length > 20) {
+    @if(articlesCount() > 20) {
     <mat-paginator
       class="mt-8 rounded-md border border-gray-200 bg-white shadow-sm shadow-gray-950/5"
-      [length]="articlesStore.total()"
-      [pageIndex]="page - 1"
+      [length]="articlesCount()"
+      [pageIndex]="page() - 1"
       [pageSize]="limit"
       [hidePageSize]="true"
       (page)="pageChanged($event)" />

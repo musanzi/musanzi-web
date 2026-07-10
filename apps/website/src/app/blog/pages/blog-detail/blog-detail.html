@@ -6,11 +6,11 @@
     </a>
   </header>
 
-  @if (articlesStore.isLoading()) {
+  @if (article.isLoading()) {
   <ui-loader />
-  } @else if (articlesStore.error()) {
-  <section class="rounded-md border border-red-200 bg-red-50 p-5 text-red-700">{{ articlesStore.error() }}</section>
-  } @else if (articlesStore.article(); as article) {
+  } @else if (article.error()) {
+  <section class="rounded-md border border-red-200 bg-red-50 p-5 text-red-700">{{ article.error()?.message }}</section>
+  } @else if (article.value(); as article) {
   <article>
     <div class="mb-8">
       <div class="flex flex-wrap items-center gap-2 text-sm text-gray-500">
@@ -42,7 +42,7 @@
     </div>
     }
 
-    <blog-article-content [content]="article.content ?? ''" />
+    <blog-article-content [content]="article?.content ?? ''" />
   </article>
   }
   <landing-footer />
