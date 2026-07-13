@@ -7,43 +7,47 @@
   </header>
 
   @if (article.isLoading()) {
-  <ui-loader />
+    <ui-loader />
   } @else if (article.error()) {
-  <section class="rounded-md border border-red-200 bg-red-50 p-5 text-red-700">{{ article.error()?.message }}</section>
+    <section class="rounded-md border border-red-200 bg-red-50 p-5 text-red-700">
+      {{ article.error()?.message }}
+    </section>
   } @else if (article.value(); as article) {
-  <article>
-    <div class="mb-8">
-      <div class="flex flex-wrap items-center gap-2 text-sm text-gray-500">
-        @if (article.publishedAt) {
-        <time [dateTime]="article.publishedAt">{{ article.publishedAt | date: 'mediumDate' }}</time>
-        }
-        <span class="inline-flex items-center gap-1">
-          <mat-icon class="size-4" svgIcon="eye" />
-          {{ (article.viewsCount ?? 0) | number }}
-        </span>
-        @if (article.tags.length) { @for (tag of article.tags; track tag.id) {
-        <div>
-          <span
-            class="flex items-center rounded-full bg-primary-400/10 px-3 py-1 text-xs font-medium leading-5 text-primary-600">
-            {{ tag.name }}
+    <article>
+      <div class="mb-8">
+        <div class="flex flex-wrap items-center gap-2 text-sm text-gray-500">
+          @if (article.publishedAt) {
+            <time [dateTime]="article.publishedAt">{{ article.publishedAt | date: 'mediumDate' }}</time>
+          }
+          <span class="inline-flex items-center gap-1">
+            <mat-icon class="size-4" svgIcon="eye" />
+            {{ article.viewsCount ?? 0 | number }}
           </span>
+          @if (article.tags.length) {
+            @for (tag of article.tags; track tag.id) {
+              <div>
+                <span
+                  class="flex items-center rounded-full bg-primary-400/10 px-3 py-1 text-xs font-medium leading-5 text-primary-600">
+                  {{ tag.name }}
+                </span>
+              </div>
+            }
+          }
         </div>
-        } }
+
+        <h1 class="mt-4 text-4xl leading-8 font-bold text-gray-950 md:text-6xl">{{ article.title }}</h1>
+
+        <p class="mt-6 text-xl leading-7 text-gray-600">{{ article.summary }}</p>
       </div>
 
-      <h1 class="mt-4 text-4xl leading-8 font-bold text-gray-950 md:text-6xl">{{ article.title }}</h1>
+      @if (coverUrl(); as cover) {
+        <div class="mb-10 aspect-video overflow-hidden rounded-md border border-gray-200 bg-gray-100">
+          <img class="size-full object-cover" [src]="cover" [alt]="article.title + ' cover'" />
+        </div>
+      }
 
-      <p class="mt-6 text-xl leading-7 text-gray-600">{{ article.summary }}</p>
-    </div>
-
-    @if (coverUrl(); as cover) {
-    <div class="mb-10 aspect-video overflow-hidden rounded-md border border-gray-200 bg-gray-100">
-      <img class="size-full object-cover" [src]="cover" [alt]="article.title + ' cover'" />
-    </div>
-    }
-
-    <blog-article-content [content]="article?.content ?? ''" />
-  </article>
+      <blog-article-content [content]="article?.content ?? ''" />
+    </article>
   }
   <landing-footer />
 </main>

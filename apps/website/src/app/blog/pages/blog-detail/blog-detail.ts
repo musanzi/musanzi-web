@@ -26,5 +26,6 @@ export class BlogDetail {
     if (this.article.hasValue()) {
       return getArticleCoverUrl(this.article.value().cover);
     }
+    return null;
   });
 }
