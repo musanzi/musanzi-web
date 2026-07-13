@@ -4,5 +4,6 @@
   "bracketSpacing": true,
   "bracketSameLine": true,
   "arrowParens": "always",
-  "trailingComma": "none"
+  "trailingComma": "none",
+  "overrides": [{ "files": "*.html", "options": { "parser": "angular" } }]
 }
