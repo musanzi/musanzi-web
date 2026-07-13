@@ -42,9 +42,6 @@ export class BlogList {
     params: this.params()
   }));
 
-  readonly articles = computed(() => (this.articlesRessource.hasValue() ? this.articlesRessource.value()[0] : []));
-  readonly articlesCount = computed(() => (this.articlesRessource.hasValue() ? this.articlesRessource.value()[1] : 0));
-
   protected pageChanged(event: PageEvent): void {
     const page = event.pageIndex + 1;
 
