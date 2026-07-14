@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Service } from '@angular/core';
-import { createParams, IArticle } from '@libs/utils';
+import { IArticle } from '@libs/utils';
 import { Observable } from 'rxjs';
-import { IArticlePayload, IArticleQuery } from '../interfaces';
+import { IArticlePayload } from '../interfaces';
 
 @Service()
 export class ArticlesService {
@@ -14,10 +14,6 @@ export class ArticlesService {
 
   delete(articleId: string): Observable<void> {
     return this.http.delete<void>(`/articles/${articleId}`);
-  }
-
-  findAll(query: IArticleQuery): Observable<[IArticle[], number]> {
-    return this.http.get<[IArticle[], number]>('/articles/admin', { params: createParams(query) });
   }
 
   findOne(articleId: string): Observable<IArticle> {
