@@ -11,14 +11,14 @@
   </h2>
   <ol class="grid max-w-2xl">
     @for (principle of workPrinciples; track principle) {
-    <li
-      class="relative grid grid-cols-[1.75rem_1fr] gap-3 pb-5 after:absolute after:top-7 after:bottom-0 after:left-3.5 after:w-px after:bg-gray-300 last:after:hidden">
-      <span
-        class="relative z-10 flex size-7 items-center justify-center rounded-full border border-gray-300 bg-gray-50 text-[0.7rem] font-bold tabular-nums text-gray-700">
-        {{ $index + 1 }}
-      </span>
-      <p class="text-lg leading-7 text-gray-600">{{ principle }}</p>
-    </li>
+      <li
+        class="relative grid grid-cols-[1.75rem_1fr] gap-3 pb-5 after:absolute after:top-7 after:bottom-0 after:left-3.5 after:w-px after:bg-gray-300 last:after:hidden">
+        <span
+          class="relative z-10 flex size-7 items-center justify-center rounded-full border border-gray-300 bg-gray-50 text-[0.7rem] font-bold tabular-nums text-gray-700">
+          {{ $index + 1 }}
+        </span>
+        <p class="text-lg leading-6 text-gray-600">{{ principle }}</p>
+      </li>
     }
   </ol>
 </section>
