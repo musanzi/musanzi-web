@@ -6,13 +6,13 @@
     </a>
   </header>
 
-  @if (article.isLoading()) {
+  @if (articleResource.isLoading()) {
     <ui-loader />
-  } @else if (article.error()) {
+  } @else if (articleResource.error()) {
     <section class="rounded-md border border-red-200 bg-red-50 p-5 text-red-700">
-      {{ article.error()?.message }}
+      {{ articleResource.error()?.message }}
     </section>
-  } @else if (article.value(); as article) {
+  } @else if (articleResource.value(); as article) {
     <article>
       <div class="mb-8">
         <div class="flex flex-wrap items-center gap-2 text-sm text-gray-500">

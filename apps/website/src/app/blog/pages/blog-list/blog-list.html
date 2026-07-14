@@ -8,18 +8,18 @@
   </header>
 
   <div class="flex-1">
-    @if (articlesRessource.isLoading()) {
+    @if (articlesResource.isLoading()) {
       <ui-loader />
-    } @else if (articlesRessource.error()) {
+    } @else if (articlesResource.error()) {
       <section
         class="flex flex-col gap-3 rounded-md border border-red-200 bg-red-50 p-5 text-red-700 md:flex-row md:items-center"
         role="alert">
         <mat-icon class="shrink-0" svgIcon="triangle-alert" />
-        <p class="leading-7">{{ articlesRessource.error() }}</p>
+        <p class="leading-7">{{ articlesResource.error() }}</p>
       </section>
-    } @else if (articlesRessource.hasValue()) {
-      @let articles = articlesRessource.value()[0];
-      @let articlesCount = articlesRessource.value()[1];
+    } @else if (articlesResource.hasValue()) {
+      @let articles = articlesResource.value()[0];
+      @let articlesCount = articlesResource.value()[1];
 
       <section class="mb-6 flex items-center gap-4" aria-label="Article list summary">
         <h2 class="text-sm font-bold tracking-normal text-gray-500 uppercase">Latest writing</h2>

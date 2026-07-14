@@ -1,26 +1,20 @@
-import { computed, inject } from '@angular/core';
+import { inject } from '@angular/core';
 import { getApiErrorMessage } from '@libs/utils';
-import { patchState, signalStore, withComputed, withMethods, withProps, withState } from '@ngrx/signals';
+import { patchState, signalStore, withMethods, withProps, withState } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { catchError, exhaustMap, finalize, map, of, pipe, switchMap, tap } from 'rxjs';
-import { IArticleQuery, IArticlesState, IDeleteArticlePayload, ISaveArticlePayload } from '../interfaces';
+import { IArticlesState, IDeleteArticlePayload, ISaveArticlePayload } from '../interfaces';
 import { ArticlesService } from './articles.service';
 
 const initialState: IArticlesState = {
   article: null,
-  data: [[], 0],
   error: null,
   isLoading: false,
-  isSaving: false,
   success: null
 };
 
 export const ArticlesStore = signalStore(
   withState(initialState),
-  withComputed(({ data }) => ({
-    articles: computed(() => data()[0]),
-    total: computed(() => data()[1])
-  })),
   withProps(() => ({
     _articlesService: inject(ArticlesService)
   })),
@@ -40,34 +34,13 @@ export const ArticlesStore = signalStore(
         )
       )
     ),
-    loadArticles: rxMethod<IArticleQuery>(
-      pipe(
-        tap(() => patchState(store, { error: null, isLoading: true })),
-        exhaustMap((query) =>
-          _articlesService.findAll(query).pipe(
-            tap((data) => patchState(store, { data })),
-            catchError(() => {
-              patchState(store, { data: [[], 0] });
-              return of(null);
-            }),
-            finalize(() => patchState(store, { isLoading: false }))
-          )
-        )
-      )
-    ),
     deleteArticle: rxMethod<IDeleteArticlePayload>(
       pipe(
         tap(() => patchState(store, { error: null, success: null })),
         exhaustMap(({ articleId }) =>
           _articlesService.delete(articleId).pipe(
             tap(() => {
-              const [articles, total] = store.data();
-              const nextArticles = articles.filter((article) => article.id !== articleId);
-
-              patchState(store, {
-                data: [nextArticles, total - 1],
-                success: 'Article deleted.'
-              });
+              patchState(store, { success: 'Article deleted.' });
             }),
             catchError((error: Error) => {
               patchState(store, { error: getApiErrorMessage(error, 'Unable to delete the article') });
@@ -79,10 +52,9 @@ export const ArticlesStore = signalStore(
     ),
     saveArticle: rxMethod<ISaveArticlePayload>(
       pipe(
-        tap(() => patchState(store, { error: null, isSaving: true, success: null })),
+        tap(() => patchState(store, { error: null, isLoading: true, success: null })),
         exhaustMap(({ articleId, cover, payload }) => {
           const request = articleId ? _articlesService.update(articleId, payload) : _articlesService.create(payload);
-
           return request.pipe(
             switchMap((savedArticle) => {
               return cover
@@ -103,24 +75,12 @@ export const ArticlesStore = signalStore(
                   )
                 : of({ article: savedArticle, uploadFailed: false });
             }),
-            tap(({ article, uploadFailed }) => {
-              const [articles, total] = store.data();
-
+            tap(({ uploadFailed }) => {
               if (articleId) {
-                patchState(store, {
-                  article,
-                  data: [articles.map((item) => (item.id === articleId ? article : item)), total],
-                  success: uploadFailed ? null : 'Article updated.'
-                });
-
+                patchState(store, { success: uploadFailed ? null : 'Article updated.' });
                 return;
               }
-
-              patchState(store, {
-                article,
-                data: [[article, ...articles], total + 1],
-                success: uploadFailed ? null : 'Article created.'
-              });
+              patchState(store, { success: uploadFailed ? null : 'Article created.' });
             }),
             catchError((error: Error) => {
               patchState(store, {
@@ -131,16 +91,10 @@ export const ArticlesStore = signalStore(
               });
               return of(null);
             }),
-            finalize(() => patchState(store, { isSaving: false }))
+            finalize(() => patchState(store, { isLoading: false }))
           );
         })
       )
-    ),
-    clearArticle(): void {
-      patchState(store, { article: null });
-    },
-    clearMessages(): void {
-      patchState(store, { error: null, success: null });
-    }
+    )
   }))
 );

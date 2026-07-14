@@ -22,13 +22,13 @@
         <div class="flex w-full flex-col gap-3 md:flex-row xl:ml-auto xl:max-w-3xl">
           <mat-form-field class="md:flex-1">
             <mat-icon matPrefix svgIcon="search" />
-            <input matInput [formControl]="searchControl" placeholder="Title, summary, or content" />
+            <input matInput [(ngModel)]="query" placeholder="Title, summary, or content" />
           </mat-form-field>
 
           <mat-form-field class="md:w-40">
-            <mat-select [ngModel]="query.status" (ngModelChange)="statusChanged($event)">
-              @for (option of statusOptions; track option.value) {
-              <mat-option [value]="option.value">{{ option.label }}</mat-option>
+            <mat-select [(ngModel)]="params().status" (ngModelChange)="statusChanged($event)">
+              @for (option of statusOptions(); track option.value) {
+                <mat-option [value]="option.value">{{ option.label }}</mat-option>
               }
             </mat-select>
           </mat-form-field>
@@ -38,140 +38,153 @@
 
     <mat-card-content class="flex flex-auto flex-col overflow-hidden p-0">
       <div class="relative isolate overflow-x-visible overflow-y-hidden">
-        @if (articlesStore.isLoading()) {
-        <div class="-mt-px min-w-full whitespace-nowrap" aria-busy="true" aria-label="Loading articles">
-          <div
-            class="flex min-h-14 items-center border-b border-neutral-200 px-6 text-xs font-medium uppercase tracking-wide text-on-surface-variant">
-            <div class="min-w-80 flex-1">Article</div>
-            <div class="w-32 shrink-0">Status</div>
-            <div class="w-28 shrink-0">Views</div>
-            <div class="w-40 shrink-0">Published</div>
-            <div class="w-40 shrink-0">Updated</div>
-            <div class="w-32 shrink-0 text-right">Actions</div>
-          </div>
-
-          <div class="divide-y divide-neutral-200">
-            @for (row of [1, 2, 3, 4, 5, 6]; track row) {
-            <div class="flex min-h-20 items-center px-6">
-              <div class="flex min-w-80 flex-1 items-center gap-3">
-                <div class="h-12 w-16 animate-pulse rounded bg-neutral-200"></div>
-                <div class="flex flex-col gap-2">
-                  <div class="h-3.5 w-44 animate-pulse rounded-full bg-neutral-300"></div>
-                  <div class="h-3 w-64 animate-pulse rounded-full bg-neutral-200"></div>
-                </div>
-              </div>
-              <div class="w-32 shrink-0">
-                <div class="h-7 w-20 animate-pulse rounded-full bg-neutral-200"></div>
-              </div>
-              <div class="w-48 shrink-0">
-                <div class="h-7 w-28 animate-pulse rounded-full bg-neutral-300/80"></div>
-              </div>
-              <div class="w-28 shrink-0">
-                <div class="h-3.5 w-12 animate-pulse rounded-full bg-neutral-300"></div>
-              </div>
-              <div class="w-40 shrink-0">
-                <div class="h-3.5 w-24 animate-pulse rounded-full bg-neutral-300"></div>
-              </div>
-              <div class="w-40 shrink-0">
-                <div class="h-3.5 w-24 animate-pulse rounded-full bg-neutral-300"></div>
-              </div>
-              <div class="flex w-32 shrink-0 justify-end gap-2">
-                <div class="size-9 animate-pulse rounded-full bg-neutral-200"></div>
-                <div class="size-9 animate-pulse rounded-full bg-neutral-300/80"></div>
-              </div>
+        @if (articlesResource.isLoading()) {
+          <div class="-mt-px min-w-full whitespace-nowrap" aria-busy="true" aria-label="Loading articles">
+            <div
+              class="flex min-h-14 items-center border-b border-neutral-200 px-6 text-xs font-medium uppercase tracking-wide text-on-surface-variant">
+              <div class="min-w-80 flex-1">Article</div>
+              <div class="w-32 shrink-0">Status</div>
+              <div class="w-28 shrink-0">Views</div>
+              <div class="w-40 shrink-0">Published</div>
+              <div class="w-40 shrink-0">Updated</div>
+              <div class="w-32 shrink-0 text-right">Actions</div>
             </div>
-            }
-          </div>
-        </div>
-        } @else {
-        <table class="-mt-px whitespace-nowrap" mat-table [dataSource]="articlesStore.articles()" [trackBy]="trackBy">
-          <ng-container matColumnDef="article">
-            <th mat-header-cell *matHeaderCellDef>Article</th>
-            <td mat-cell *matCellDef="let article">
-              <div class="flex items-center gap-3">
-                <div
-                  class="flex h-12 w-16 shrink-0 items-center justify-center overflow-hidden rounded border border-neutral-200 bg-neutral-100 text-neutral-500">
-                  @if (coverUrl(article); as cover) {
-                  <img class="size-full object-cover" [src]="cover" [alt]="article.title + ' cover'" />
-                  } @else {
-                  <mat-icon class="size-5" svgIcon="image" />
-                  }
-                </div>
-                <div class="flex min-w-0 flex-col gap-1">
-                  <span class="font-medium">{{ article.title }}</span>
-                  <span class="line-clamp-1 max-w-xl whitespace-normal text-sm text-on-surface-variant">
-                    {{ article.summary }}
-                  </span>
-                </div>
-              </div>
-            </td>
-          </ng-container>
 
-          <ng-container matColumnDef="status">
-            <th mat-header-cell *matHeaderCellDef>Status</th>
-            <td mat-cell *matCellDef="let article">
-              @if (article.published) {
-              <span class="rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700"> Published </span>
-              } @else {
-              <span class="rounded-full bg-neutral-200 px-2.5 py-1 text-xs font-medium text-neutral-700"> Draft </span>
+            <div class="divide-y divide-neutral-200">
+              @for (row of [1, 2, 3, 4, 5, 6]; track row) {
+                <div class="flex min-h-20 items-center px-6">
+                  <div class="flex min-w-80 flex-1 items-center gap-3">
+                    <div class="h-12 w-16 animate-pulse rounded bg-neutral-200"></div>
+                    <div class="flex flex-col gap-2">
+                      <div class="h-3.5 w-44 animate-pulse rounded-full bg-neutral-300"></div>
+                      <div class="h-3 w-64 animate-pulse rounded-full bg-neutral-200"></div>
+                    </div>
+                  </div>
+                  <div class="w-32 shrink-0">
+                    <div class="h-7 w-20 animate-pulse rounded-full bg-neutral-200"></div>
+                  </div>
+                  <div class="w-48 shrink-0">
+                    <div class="h-7 w-28 animate-pulse rounded-full bg-neutral-300/80"></div>
+                  </div>
+                  <div class="w-28 shrink-0">
+                    <div class="h-3.5 w-12 animate-pulse rounded-full bg-neutral-300"></div>
+                  </div>
+                  <div class="w-40 shrink-0">
+                    <div class="h-3.5 w-24 animate-pulse rounded-full bg-neutral-300"></div>
+                  </div>
+                  <div class="w-40 shrink-0">
+                    <div class="h-3.5 w-24 animate-pulse rounded-full bg-neutral-300"></div>
+                  </div>
+                  <div class="flex w-32 shrink-0 justify-end gap-2">
+                    <div class="size-9 animate-pulse rounded-full bg-neutral-200"></div>
+                    <div class="size-9 animate-pulse rounded-full bg-neutral-300/80"></div>
+                  </div>
+                </div>
               }
-            </td>
-          </ng-container>
+            </div>
+          </div>
+        } @else if (articlesResource.hasValue()) {
+          @let articles = articlesResource.value()[0];
+          @let articlesCount = articlesResource.value()[1];
 
-          <ng-container matColumnDef="viewsCount">
-            <th mat-header-cell *matHeaderCellDef>Views</th>
-            <td mat-cell *matCellDef="let article">
-              <span class="tabular-nums">{{ article.viewsCount ?? 0 }}</span>
-            </td>
-          </ng-container>
+          <table class="-mt-px whitespace-nowrap" mat-table [dataSource]="articles" [trackBy]="trackBy">
+            <ng-container matColumnDef="article">
+              <th mat-header-cell *matHeaderCellDef>Article</th>
+              <td mat-cell *matCellDef="let article">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="flex h-12 w-16 shrink-0 items-center justify-center overflow-hidden rounded border border-neutral-200 bg-neutral-100 text-neutral-500">
+                    @if (coverUrl(article.cover); as cover) {
+                      <img class="size-full object-cover" [src]="cover" [alt]="article.title + ' cover'" />
+                    } @else {
+                      <mat-icon class="size-5" svgIcon="image" />
+                    }
+                  </div>
+                  <div class="flex min-w-0 flex-col gap-1">
+                    <span class="font-medium">{{ article.title }}</span>
+                    <span class="line-clamp-1 max-w-xl whitespace-normal text-sm text-on-surface-variant">
+                      {{ article.summary }}
+                    </span>
+                  </div>
+                </div>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="publishedAt">
-            <th mat-header-cell *matHeaderCellDef>Published</th>
-            <td mat-cell *matCellDef="let article">
-              <span class="tabular-nums">
-                {{ article.publishedAt ? (article.publishedAt | date: 'mediumDate') : '-' }}
-              </span>
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <td mat-cell *matCellDef="let article">
+                @if (isPublished(article)) {
+                  <span class="rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700">
+                    Published
+                  </span>
+                } @else {
+                  <span class="rounded-full bg-neutral-200 px-2.5 py-1 text-xs font-medium text-neutral-700">
+                    Draft
+                  </span>
+                }
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="updatedAt">
-            <th mat-header-cell *matHeaderCellDef>Updated</th>
-            <td mat-cell *matCellDef="let article">
-              <span class="tabular-nums">{{ article.updatedAt | date: 'mediumDate' }}</span>
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="viewsCount">
+              <th mat-header-cell *matHeaderCellDef>Views</th>
+              <td mat-cell *matCellDef="let article">
+                <span class="tabular-nums">{{ article.viewsCount ?? 0 }}</span>
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef class="text-right">Actions</th>
-            <td mat-cell *matCellDef="let article" class="text-right">
-              <a matIconButton type="button" aria-label="Edit article" [routerLink]="['/articles', article.id, 'edit']">
-                <mat-icon svgIcon="pencil" />
-              </a>
-              <button matIconButton type="button" aria-label="Delete article" (click)="deleteArticle(article)">
-                <mat-icon svgIcon="trash-2" />
-              </button>
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="publishedAt">
+              <th mat-header-cell *matHeaderCellDef>Published</th>
+              <td mat-cell *matCellDef="let article">
+                <span class="tabular-nums">
+                  {{ article.publishedAt ? (article.publishedAt | date: 'mediumDate') : '-' }}
+                </span>
+              </td>
+            </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr
-            class="group hover:bg-on-surface-variant/4 relative"
-            mat-row
-            *matRowDef="let row; columns: displayedColumns"></tr>
-        </table>
+            <ng-container matColumnDef="updatedAt">
+              <th mat-header-cell *matHeaderCellDef>Updated</th>
+              <td mat-cell *matCellDef="let article">
+                <span class="tabular-nums">{{ article.updatedAt | date: 'mediumDate' }}</span>
+              </td>
+            </ng-container>
 
-        @if (!articlesStore.isLoading() && articlesStore.articles().length === 0) {
-        <div class="flex min-h-32 items-center justify-center text-sm text-on-surface-variant">No articles found.</div>
-        } }
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef class="text-right">Actions</th>
+              <td mat-cell *matCellDef="let article" class="text-right">
+                <a
+                  matIconButton
+                  type="button"
+                  aria-label="Edit article"
+                  [routerLink]="['/articles', article.id, 'edit']">
+                  <mat-icon svgIcon="pencil" />
+                </a>
+                <button matIconButton type="button" aria-label="Delete article" (click)="deleteArticle(article)">
+                  <mat-icon svgIcon="trash-2" />
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
+            <tr
+              class="group hover:bg-on-surface-variant/4 relative"
+              mat-row
+              *matRowDef="let row; columns: displayedColumns()"></tr>
+          </table>
+
+          @if (!articlesResource.isLoading() && articlesCount === 0) {
+            <div class="flex min-h-32 items-center justify-center text-sm text-on-surface-variant">
+              No articles found.
+            </div>
+          }
+          <mat-paginator
+            [length]="articlesCount"
+            [pageIndex]="params().page - 1"
+            [pageSize]="params().limit"
+            [pageSizeOptions]="[20, 50, 100]"
+            (page)="pageChanged($event)"
+            showFirstLastButtons />
+        }
       </div>
     </mat-card-content>
   </mat-card>
-
-  <mat-paginator
-    [length]="articlesStore.total()"
-    [pageIndex]="query.page - 1"
-    [pageSize]="query.limit"
-    [pageSizeOptions]="[20, 50, 100]"
-    (page)="pageChanged($event)"
-    showFirstLastButtons />
 </section>

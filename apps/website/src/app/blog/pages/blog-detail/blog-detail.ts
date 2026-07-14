@@ -20,11 +20,11 @@ export class BlogDetail {
 
   private readonly slug = signal(this.route.snapshot.paramMap.get('slug'));
 
-  readonly article = httpResource<IArticle>(() => `/articles/${this.slug()}`);
+  readonly articleResource = httpResource<IArticle>(() => `/articles/${this.slug()}`);
 
   protected readonly coverUrl = computed(() => {
-    if (this.article.hasValue()) {
-      return getArticleCoverUrl(this.article.value().cover);
+    if (this.articleResource.hasValue()) {
+      return getArticleCoverUrl(this.articleResource.value().cover);
     }
     return null;
   });

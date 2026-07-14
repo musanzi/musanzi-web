@@ -53,18 +53,18 @@ export class ArticleForm {
     title: ''
   });
   protected readonly articleForm = form(this.articleModel, (schema) => {
-    disabled(schema.title, { when: () => this.articlesStore.isSaving() });
+    disabled(schema.title, { when: () => this.articlesStore.isLoading() });
     required(schema.title, { message: 'Enter an article title.' });
 
-    disabled(schema.summary, { when: () => this.articlesStore.isSaving() });
+    disabled(schema.summary, { when: () => this.articlesStore.isLoading() });
     required(schema.summary, { message: 'Enter an article summary.' });
 
-    disabled(schema.content, { when: () => this.articlesStore.isSaving() });
+    disabled(schema.content, { when: () => this.articlesStore.isLoading() });
     required(schema.content, { message: 'Enter article content.' });
 
-    disabled(schema.publishedAt, { when: () => this.articlesStore.isSaving() });
+    disabled(schema.publishedAt, { when: () => this.articlesStore.isLoading() });
 
-    disabled(schema.tagIds, { when: () => this.articlesStore.isSaving() });
+    disabled(schema.tagIds, { when: () => this.articlesStore.isLoading() });
   });
   protected readonly existingCoverUrl = computed(() => getArticleCoverUrl(this.articlesStore.article()?.cover ?? null));
   protected readonly displayCoverUrl = computed(() => this.coverPreviewUrl() ?? this.existingCoverUrl());
@@ -77,8 +77,6 @@ export class ArticleForm {
 
     if (this.articleId) {
       this.articlesStore.loadArticle(this.articleId);
-    } else {
-      this.articlesStore.clearArticle();
     }
 
     effect(() => {
@@ -95,13 +93,11 @@ export class ArticleForm {
 
       if (error) {
         this.snackBar.open(error, 'Close', { duration: 5000 });
-        queueMicrotask(() => this.articlesStore.clearMessages());
       }
 
       if (success) {
         this.snackBar.open(success, 'Close', { duration: 3000 });
         queueMicrotask(() => {
-          this.articlesStore.clearMessages();
           this.router.navigateByUrl('/articles');
         });
       }

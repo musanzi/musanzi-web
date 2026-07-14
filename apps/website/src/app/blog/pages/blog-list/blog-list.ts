@@ -37,7 +37,7 @@ export class BlogList {
     status: 'published'
   }));
 
-  readonly articlesRessource = httpResource<[IArticle[], number]>(() => ({
+  readonly articlesResource = httpResource<[IArticle[], number]>(() => ({
     url: '/articles',
     params: this.params()
   }));
