@@ -1,6 +1,7 @@
-import { Component, DestroyRef, effect, inject } from '@angular/core';
+import { httpResource } from '@angular/common/http';
+import { Component, debounced, DestroyRef, effect, inject, linkedSignal, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { MatButtonModule, MatIconButton } from '@angular/material/button';
 import { MatCard, MatCardContent, MatCardHeader } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
@@ -8,19 +9,18 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
 import { ConfirmDialog } from '@admin/app/dashboard/ui/confirm-dialog/confirm-dialog';
 import { DEFAULT_LIMIT, IRole, MAX_LIMIT } from '@libs/utils';
-import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { RolesStore } from '../../data-access';
-import { IRoleQuery, IRolePayload } from '../../interfaces';
+import { IRolePayload } from '../../interfaces';
 import { RoleFormDialog } from '../../ui/role-form-dialog/role-form-dialog';
 
 @Component({
   selector: 'admin-roles',
   providers: [RolesStore],
   imports: [
+    FormsModule,
     MatButtonModule,
     MatCard,
     MatCardContent,
@@ -30,48 +30,33 @@ import { RoleFormDialog } from '../../ui/role-form-dialog/role-form-dialog';
     MatIconButton,
     MatInputModule,
     MatPaginatorModule,
-    MatTableModule,
-    ReactiveFormsModule
+    MatTableModule
   ],
   templateUrl: './roles.html'
 })
 export class Roles {
+  protected readonly rolesStore = inject(RolesStore);
   private readonly destroyRef = inject(DestroyRef);
   private readonly dialog = inject(MatDialog);
-  private readonly snackBar = inject(MatSnackBar);
 
-  protected readonly displayedColumns = ['name', 'actions'];
-  protected readonly query = {
+  protected readonly displayedColumns = signal<string[]>(['name', 'actions']);
+  query = signal('');
+  debouncedQuery = debounced(this.query, 300);
+  protected readonly params = linkedSignal(() => ({
     limit: DEFAULT_LIMIT,
     page: 1,
-    q: ''
-  } satisfies IRoleQuery;
-  protected readonly rolesStore = inject(RolesStore);
-  protected readonly searchControl = new FormControl('', { nonNullable: true });
+    q: this.debouncedQuery.value()
+  }));
+
+  protected readonly rolesResource = httpResource<[IRole[], number]>(() => ({
+    url: '/roles',
+    params: this.params()
+  }));
 
   constructor() {
-    this.searchControl.valueChanges
-      .pipe(debounceTime(300), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        this.query.page = 1;
-        this.query.q = this.searchControl.value.trim();
-        this.loadRoles();
-      });
-
-    this.loadRoles();
-
     effect(() => {
-      const error = this.rolesStore.error();
-      const success = this.rolesStore.success();
-
-      if (error) {
-        this.snackBar.open(error, 'Close', { duration: 5000 });
-        queueMicrotask(() => this.rolesStore.clearMessages());
-      }
-
-      if (success) {
-        this.snackBar.open(success, 'Close', { duration: 3000 });
-        queueMicrotask(() => this.rolesStore.clearMessages());
+      if (this.rolesStore.success()) {
+        this.rolesResource.reload();
       }
     });
   }
@@ -127,18 +112,7 @@ export class Roles {
       });
   }
 
-  protected loadRoles(): void {
-    this.query.limit = Math.min(Number(this.query.limit), MAX_LIMIT);
-    this.rolesStore.loadRoles(this.query);
-  }
-
   protected pageChanged(event: PageEvent): void {
-    this.query.page = event.pageIndex + 1;
-    this.query.limit = Math.min(event.pageSize, MAX_LIMIT);
-    this.loadRoles();
-  }
-
-  protected trackBy(_: number, role: IRole): string {
-    return role.id;
+    this.params.update((p) => ({ ...p, page: event.pageIndex + 1, limit: Math.min(event.pageSize, MAX_LIMIT) }));
   }
 }

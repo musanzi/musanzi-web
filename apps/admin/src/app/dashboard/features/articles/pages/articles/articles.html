@@ -87,7 +87,7 @@
           @let articles = articlesResource.value()[0];
           @let articlesCount = articlesResource.value()[1];
 
-          <table class="-mt-px whitespace-nowrap" mat-table [dataSource]="articles" [trackBy]="trackBy">
+          <table class="-mt-px whitespace-nowrap" mat-table [dataSource]="articles">
             <ng-container matColumnDef="article">
               <th mat-header-cell *matHeaderCellDef>Article</th>
               <td mat-cell *matCellDef="let article">

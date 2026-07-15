@@ -7,7 +7,6 @@ import { IArticlesState, IDeleteArticlePayload, ISaveArticlePayload } from '../i
 import { ArticlesService } from './articles.service';
 
 const initialState: IArticlesState = {
-  article: null,
   error: null,
   isLoading: false,
   success: null
@@ -19,21 +18,6 @@ export const ArticlesStore = signalStore(
     _articlesService: inject(ArticlesService)
   })),
   withMethods(({ _articlesService, ...store }) => ({
-    loadArticle: rxMethod<string>(
-      pipe(
-        tap(() => patchState(store, { article: null, error: null, isLoading: true })),
-        exhaustMap((articleId) =>
-          _articlesService.findOne(articleId).pipe(
-            tap((article) => patchState(store, { article })),
-            catchError((error: Error) => {
-              patchState(store, { error: getApiErrorMessage(error, 'Unable to load the article') });
-              return of(null);
-            }),
-            finalize(() => patchState(store, { isLoading: false }))
-          )
-        )
-      )
-    ),
     deleteArticle: rxMethod<IDeleteArticlePayload>(
       pipe(
         tap(() => patchState(store, { error: null, success: null })),

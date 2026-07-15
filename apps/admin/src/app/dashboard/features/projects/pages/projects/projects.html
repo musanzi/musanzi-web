@@ -21,14 +21,14 @@
 
         <mat-form-field class="w-full md:ml-auto md:max-w-sm">
           <mat-icon matPrefix svgIcon="search" />
-          <input matInput [formControl]="searchControl" placeholder="Name or summary" />
+          <input matInput [(ngModel)]="query" placeholder="Name or summary" />
         </mat-form-field>
       </div>
     </mat-card-header>
 
     <mat-card-content class="flex flex-auto flex-col overflow-hidden p-0">
       <div class="relative isolate overflow-x-visible overflow-y-hidden">
-        @if (projectsStore.isLoading()) {
+        @if (projectsResource.isLoading()) {
         <div class="-mt-px min-w-full whitespace-nowrap" aria-busy="true" aria-label="Loading projects">
           <div
             class="grid min-h-14 grid-cols-[minmax(18rem,1fr)_minmax(20rem,1.2fr)_8rem_10rem_8rem] items-center border-b border-neutral-200 px-6 text-xs font-medium uppercase tracking-wide text-on-surface-variant">
@@ -58,15 +58,18 @@
             }
           </div>
         </div>
-        } @else {
-        <table class="-mt-px whitespace-nowrap" mat-table [dataSource]="projectsStore.projects()" [trackBy]="trackBy">
+        } @else if (projectsResource.hasValue()) {
+        @let projects = projectsResource.value()[0];
+        @let projectsCount = projectsResource.value()[1];
+
+        <table class="-mt-px whitespace-nowrap" mat-table [dataSource]="projects">
           <ng-container matColumnDef="project">
             <th mat-header-cell *matHeaderCellDef>Project</th>
             <td mat-cell *matCellDef="let project">
               <div class="flex items-center gap-3">
                 <div
                   class="flex h-12 w-16 shrink-0 items-center justify-center overflow-hidden rounded border border-neutral-200 bg-neutral-100 text-neutral-500">
-                  @if (imageUrl(project); as image) {
+                  @if (imageUrl(project.image); as image) {
                   <img class="size-full object-cover" [src]="image" [alt]="project.name + ' image'" />
                   } @else {
                   <mat-icon class="size-5" svgIcon="image" />
@@ -112,27 +115,27 @@
             </td>
           </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
           <tr
             class="group hover:bg-on-surface-variant/4 relative"
             mat-row
-            *matRowDef="let row; columns: displayedColumns"></tr>
+            *matRowDef="let row; columns: displayedColumns()"></tr>
         </table>
 
-        @if (!projectsStore.isLoading() && projectsStore.projects().length === 0) {
+        @if (!projectsResource.isLoading() && projectsCount === 0) {
         <div class="flex min-h-32 items-center justify-center text-sm text-on-surface-variant">
           No projects found.
         </div>
-        } }
+        }
+        <mat-paginator
+          [length]="projectsCount"
+          [pageIndex]="params().page - 1"
+          [pageSize]="params().limit"
+          [pageSizeOptions]="[20, 50, 100]"
+          (page)="pageChanged($event)"
+          showFirstLastButtons />
+        }
       </div>
     </mat-card-content>
   </mat-card>
-
-  <mat-paginator
-    [length]="projectsStore.total()"
-    [pageIndex]="query.page - 1"
-    [pageSize]="query.limit"
-    [pageSizeOptions]="[20, 50, 100]"
-    (page)="pageChanged($event)"
-    showFirstLastButtons />
 </section>

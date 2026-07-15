@@ -21,7 +21,7 @@
 
         <mat-form-field class="w-full md:ml-auto md:max-w-sm">
           <mat-icon matPrefix svgIcon="search" />
-          <input matInput [formControl]="searchControl" placeholder="Tag name" />
+          <input matInput [(ngModel)]="query" placeholder="Tag name" />
         </mat-form-field>
       </div>
     </mat-card-header>
@@ -29,7 +29,7 @@
     <mat-card-content class="flex flex-auto flex-col overflow-hidden p-0">
       <div class="flex flex-col">
         <div class="relative isolate overflow-x-visible overflow-y-hidden">
-          @if (tagsStore.isLoading()) {
+          @if (tagsResource.isLoading()) {
           <div class="-mt-px min-w-full whitespace-nowrap" aria-busy="true" aria-label="Loading tags">
             <div
               class="grid min-h-14 grid-cols-[minmax(14rem,1fr)_10rem_8rem] items-center border-b border-neutral-200 px-6 text-xs font-medium uppercase tracking-wide text-on-surface-variant">
@@ -54,9 +54,11 @@
               }
             </div>
           </div>
-          } @else {
+          } @else if (tagsResource.hasValue()) {
+          @let tags = tagsResource.value()[0];
+          @let tagsCount = tagsResource.value()[1];
 
-          <table class="-mt-px whitespace-nowrap" mat-table [dataSource]="tagsStore.tags()" [trackBy]="trackBy">
+          <table class="-mt-px whitespace-nowrap" mat-table [dataSource]="tags">
             <ng-container matColumnDef="name">
               <th mat-header-cell *matHeaderCellDef>Name</th>
               <td mat-cell *matCellDef="let tag">{{ tag.name }}</td>
@@ -81,26 +83,26 @@
               </td>
             </ng-container>
 
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
             <tr
               class="group hover:bg-on-surface-variant/4 relative"
               mat-row
-              *matRowDef="let row; columns: displayedColumns"></tr>
+              *matRowDef="let row; columns: displayedColumns()"></tr>
           </table>
 
-          @if (!tagsStore.isLoading() && tagsStore.tags().length === 0) {
+          @if (!tagsResource.isLoading() && tagsCount === 0) {
           <div class="flex min-h-32 items-center justify-center text-sm text-on-surface-variant">No tags found.</div>
-          } }
+          }
+          <mat-paginator
+            [length]="tagsCount"
+            [pageIndex]="params().page - 1"
+            [pageSize]="params().limit"
+            [pageSizeOptions]="[20, 50, 100]"
+            (page)="pageChanged($event)"
+            showFirstLastButtons />
+          }
         </div>
       </div>
     </mat-card-content>
   </mat-card>
-
-  <mat-paginator
-    [length]="tagsStore.total()"
-    [pageIndex]="query.page - 1"
-    [pageSize]="query.limit"
-    [pageSizeOptions]="[20, 50, 100]"
-    (page)="pageChanged($event)"
-    showFirstLastButtons />
 </section>

@@ -1,4 +1,5 @@
-import { Component, DestroyRef, computed, effect, inject, signal } from '@angular/core';
+import { httpResource } from '@angular/common/http';
+import { Component, DestroyRef, computed, effect, inject, linkedSignal, signal } from '@angular/core';
 import { disabled, form, FormField, required, submit } from '@angular/forms/signals';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,17 +9,15 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { TagsStore } from '@admin/app/dashboard/features/tags/data-access';
 import { UiTextEditor } from '@libs/ui';
-import { IArticle, MAX_LIMIT } from '@libs/utils';
+import { IArticle, ITag, MAX_LIMIT } from '@libs/utils';
 import { ArticlesStore } from '../../data-access';
 import { IArticleForm, IArticlePayload } from '../../interfaces';
 import { getArticleCoverUrl } from '../../utils';
 
 @Component({
   selector: 'admin-article-form',
-  providers: [ArticlesStore, TagsStore],
+  providers: [ArticlesStore],
   imports: [
     FormField,
     MatButtonModule,
@@ -39,76 +38,48 @@ export class ArticleForm {
   private readonly destroyRef = inject(DestroyRef);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly snackBar = inject(MatSnackBar);
 
   protected readonly articleId = this.route.snapshot.paramMap.get('id');
   protected readonly articlesStore = inject(ArticlesStore);
   protected readonly coverFile = signal<File | null>(null);
   protected readonly coverPreviewUrl = signal<string | null>(null);
-  protected readonly articleModel = signal<IArticleForm>({
-    content: '',
-    publishedAt: null,
-    summary: '',
-    tagIds: [],
-    title: ''
+
+  protected readonly articleResource = httpResource<IArticle>(() =>
+    this.articleId ? { url: `/articles/admin/${this.articleId}` } : undefined
+  );
+
+  protected readonly articleModel = linkedSignal<IArticleForm>(() => {
+    const article = this.articleResource.value();
+    return article
+      ? this.createFormValue(article)
+      : { content: '', publishedAt: null, summary: '', tagIds: [], title: '' };
   });
   protected readonly articleForm = form(this.articleModel, (schema) => {
-    disabled(schema.title, { when: () => this.articlesStore.isLoading() });
+    disabled(schema.title, { when: () => this.isBusy() });
     required(schema.title, { message: 'Enter an article title.' });
-
-    disabled(schema.summary, { when: () => this.articlesStore.isLoading() });
+    disabled(schema.summary, { when: () => this.isBusy() });
     required(schema.summary, { message: 'Enter an article summary.' });
-
-    disabled(schema.content, { when: () => this.articlesStore.isLoading() });
+    disabled(schema.content, { when: () => this.isBusy() });
     required(schema.content, { message: 'Enter article content.' });
-
-    disabled(schema.publishedAt, { when: () => this.articlesStore.isLoading() });
-
-    disabled(schema.tagIds, { when: () => this.articlesStore.isLoading() });
+    disabled(schema.publishedAt, { when: () => this.isBusy() });
+    disabled(schema.tagIds, { when: () => this.isBusy() });
   });
-  protected readonly existingCoverUrl = computed(() => getArticleCoverUrl(this.articlesStore.article()?.cover ?? null));
+  protected readonly existingCoverUrl = computed(() => getArticleCoverUrl(this.articleResource.value()?.cover ?? null));
   protected readonly displayCoverUrl = computed(() => this.coverPreviewUrl() ?? this.existingCoverUrl());
   protected readonly formInvalid = computed(() => this.articleForm().invalid());
+  protected readonly isBusy = computed(() => this.articlesStore.isLoading() || this.articleResource.isLoading());
   protected readonly isEdit = computed(() => Boolean(this.articleId));
-  protected readonly tagsStore = inject(TagsStore);
+
+  protected readonly tagsResource = httpResource<[ITag[], number]>(() => ({
+    url: '/tags',
+    params: { limit: MAX_LIMIT, page: 1 }
+  }));
+  protected readonly tags = computed(() => this.tagsResource.value()?.[0] ?? []);
 
   constructor() {
-    this.tagsStore.loadTags({ limit: MAX_LIMIT, page: 1 });
-
-    if (this.articleId) {
-      this.articlesStore.loadArticle(this.articleId);
-    }
-
     effect(() => {
-      const article = this.articlesStore.article();
-
-      if (article) {
-        this.articleModel.set(this.createFormValue(article));
-      }
-    });
-
-    effect(() => {
-      const error = this.articlesStore.error();
-      const success = this.articlesStore.success();
-
-      if (error) {
-        this.snackBar.open(error, 'Close', { duration: 5000 });
-      }
-
-      if (success) {
-        this.snackBar.open(success, 'Close', { duration: 3000 });
-        queueMicrotask(() => {
-          this.router.navigateByUrl('/articles');
-        });
-      }
-    });
-
-    effect(() => {
-      const error = this.tagsStore.error();
-
-      if (error) {
-        this.snackBar.open(error, 'Close', { duration: 5000 });
-        queueMicrotask(() => this.tagsStore.clearMessages());
+      if (this.articlesStore.success()) {
+        this.router.navigateByUrl('/articles');
       }
     });
 

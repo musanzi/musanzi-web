@@ -21,7 +21,7 @@
     <mat-card-content class="flex flex-auto flex-col overflow-hidden p-0">
       <div class="flex flex-col">
         <div class="relative isolate overflow-x-visible overflow-y-hidden">
-          @if (usersStore.isLoading()) {
+          @if (usersResource.isLoading()) {
           <div class="-mt-px min-w-full whitespace-nowrap" aria-busy="true" aria-label="Loading users">
             <div
               class="grid min-h-14 grid-cols-[minmax(12rem,1fr)_minmax(16rem,1.2fr)_minmax(14rem,1fr)_8rem] items-center border-b border-neutral-200 px-6 text-xs font-medium uppercase tracking-wide text-on-surface-variant">
@@ -52,8 +52,11 @@
               }
             </div>
           </div>
-          } @else {
-          <table class="-mt-px whitespace-nowrap" mat-table [dataSource]="usersStore.users()" [trackBy]="trackBy">
+          } @else if (usersResource.hasValue()) {
+          @let users = usersResource.value()[0];
+          @let usersCount = usersResource.value()[1];
+
+          <table class="-mt-px whitespace-nowrap" mat-table [dataSource]="users">
             <ng-container matColumnDef="name">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
               <td mat-cell *matCellDef="let user">
@@ -101,29 +104,27 @@
               </td>
             </ng-container>
 
-            <tr mat-header-row *matHeaderRowDef="['name', 'email',  'roles', 'actions']"></tr>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
 
             <tr
               class="group hover:bg-on-surface-variant/4 relative"
               mat-row
-              *matRowDef="
-              let row;
-              columns: ['name', 'email',  'roles', 'actions']"></tr>
+              *matRowDef="let row; columns: displayedColumns()"></tr>
           </table>
 
-          @if (!usersStore.isLoading() && usersStore.users().length === 0) {
+          @if (!usersResource.isLoading() && usersCount === 0) {
           <div class="flex min-h-32 items-center justify-center text-sm text-on-surface-variant">No users found.</div>
-          } }
+          }
+          <mat-paginator
+            [length]="usersCount"
+            [pageIndex]="params().page - 1"
+            [pageSize]="params().limit"
+            [pageSizeOptions]="[20, 50, 100]"
+            (page)="pageChanged($event)"
+            showFirstLastButtons />
+          }
         </div>
       </div>
     </mat-card-content>
   </mat-card>
-
-  <mat-paginator
-    [length]="usersStore.total()"
-    [pageIndex]="query.page - 1"
-    [pageSize]="query.limit"
-    [pageSizeOptions]="[20, 50, 100]"
-    (page)="pageChanged($event)"
-    showFirstLastButtons />
 </section>

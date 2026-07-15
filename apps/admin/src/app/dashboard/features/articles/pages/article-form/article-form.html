@@ -13,7 +13,7 @@
     </a>
   </div>
 
-  @if (articlesStore.isLoading()) {
+  @if (articleResource.isLoading()) {
     <mat-card appearance="filled" aria-busy="true" aria-label="Loading article form">
       <mat-card-content class="grid gap-6 p-6">
         <div class="h-8 w-48 animate-pulse rounded-full bg-neutral-300"></div>
@@ -72,7 +72,7 @@
 
       <div class="grid content-start gap-6">
         @if (isEdit()) {
-          @if (articlesStore.article(); as article) {
+          @if (articleResource.value(); as article) {
             <mat-card appearance="filled">
               <mat-card-header>
                 <div class="flex items-center gap-x-2">
@@ -110,7 +110,7 @@
             <mat-form-field>
               <mat-label>Tags</mat-label>
               <mat-select multiple [formField]="articleForm.tagIds">
-                @for (tag of tagsStore.tags(); track tag.id) {
+                @for (tag of tags(); track tag.id) {
                   <mat-option [value]="tag.id">{{ tag.name }}</mat-option>
                 }
               </mat-select>

@@ -16,10 +16,6 @@ export class ArticlesService {
     return this.http.delete<void>(`/articles/${articleId}`);
   }
 
-  findOne(articleId: string): Observable<IArticle> {
-    return this.http.get<IArticle>(`/articles/admin/${articleId}`);
-  }
-
   update(articleId: string, dto: IArticlePayload): Observable<IArticle> {
     return this.http.patch<IArticle>(`/articles/${articleId}`, dto);
   }

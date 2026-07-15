@@ -47,6 +47,7 @@ export class Articles {
   private readonly destroyRef = inject(DestroyRef);
   private readonly dialog = inject(MatDialog);
 
+  protected readonly coverUrl = getArticleCoverUrl;
   protected readonly displayedColumns = signal<string[]>([
     'article',
     'status',
@@ -68,7 +69,6 @@ export class Articles {
     status: 'all',
     q: this.debouncedQuery.value()
   }));
-  protected readonly coverUrl = getArticleCoverUrl;
 
   protected readonly articlesResource = httpResource<[IArticle[], number]>(() => ({
     url: '/articles/admin',
@@ -105,9 +105,5 @@ export class Articles {
 
   protected statusChanged(status: string): void {
     this.params.update((p) => ({ ...p, page: 1, status }));
-  }
-
-  protected trackBy(_: number, article: IArticle): string {
-    return article.id;
   }
 }

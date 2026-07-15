@@ -1,4 +1,5 @@
-import { Component, DestroyRef, ElementRef, effect, inject, viewChild } from '@angular/core';
+import { httpResource } from '@angular/common/http';
+import { Component, computed, DestroyRef, effect, ElementRef, inject, linkedSignal, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule, MatIconButton } from '@angular/material/button';
 import { MatCard, MatCardHeader, MatCardContent } from '@angular/material/card';
@@ -6,19 +7,17 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
-import { RolesStore } from '@admin/app/dashboard/features/roles/data-access';
 import { ConfirmDialog } from '@admin/app/dashboard/ui/confirm-dialog/confirm-dialog';
 import { getProfileAvatarUrl } from '@admin/app/dashboard/utils';
 import { DEFAULT_LIMIT, IRole, IUser, MAX_LIMIT } from '@libs/utils';
 import { UsersStore } from '../../data-access';
-import { IUserPayload, IUserQuery } from '../../interfaces';
+import { IUserPayload } from '../../interfaces';
 import { UserFormDialog } from '../../ui/user-form-dialog/user-form-dialog';
 
 @Component({
   selector: 'admin-users',
-  providers: [RolesStore, UsersStore],
+  providers: [UsersStore],
   imports: [
     MatButtonModule,
     MatChipsModule,
@@ -33,44 +32,33 @@ import { UserFormDialog } from '../../ui/user-form-dialog/user-form-dialog';
   templateUrl: './users.html'
 })
 export class Users {
+  protected readonly usersStore = inject(UsersStore);
   private readonly destroyRef = inject(DestroyRef);
   private readonly dialog = inject(MatDialog);
-  private readonly snackBar = inject(MatSnackBar);
 
-  protected readonly displayedColumns = ['name', 'email', 'roles', 'actions'];
+  protected readonly displayedColumns = signal<string[]>(['name', 'email', 'roles', 'actions']);
   protected readonly fileInput = viewChild<ElementRef<HTMLInputElement>>('fileInput');
-  protected readonly query = {
+  protected readonly params = linkedSignal(() => ({
     limit: DEFAULT_LIMIT,
     page: 1
-  } satisfies IUserQuery;
-  protected readonly rolesStore = inject(RolesStore);
-  protected readonly usersStore = inject(UsersStore);
+  }));
+
+  protected readonly usersResource = httpResource<[IUser[], number]>(() => ({
+    url: '/users',
+    params: this.params()
+  }));
+
+  protected readonly rolesResource = httpResource<[IRole[], number]>(() => ({
+    url: '/roles',
+    params: { limit: MAX_LIMIT, page: 1 }
+  }));
+  protected readonly roles = computed(() => this.rolesResource.value()?.[0] ?? []);
+  protected readonly rolesById = computed(() => new Map(this.roles().map((role) => [role.id, role.name])));
 
   constructor() {
-    this.rolesStore.loadRoles({ limit: MAX_LIMIT, page: 1 });
-    this.usersStore.loadUsers(this.query);
-
     effect(() => {
-      const error = this.usersStore.error();
-      const success = this.usersStore.success();
-
-      if (error) {
-        this.snackBar.open(error, 'Close', { duration: 5000 });
-        queueMicrotask(() => this.usersStore.clearMessages());
-      }
-
-      if (success) {
-        this.snackBar.open(success, 'Close', { duration: 3000 });
-        queueMicrotask(() => this.usersStore.clearMessages());
-      }
-    });
-
-    effect(() => {
-      const error = this.rolesStore.error();
-
-      if (error) {
-        this.snackBar.open(error, 'Close', { duration: 5000 });
-        queueMicrotask(() => this.rolesStore.clearMessages());
+      if (this.usersStore.success()) {
+        this.usersResource.reload();
       }
     });
   }
@@ -108,17 +96,11 @@ export class Users {
   }
 
   protected pageChanged(event: PageEvent): void {
-    this.query.page = event.pageIndex + 1;
-    this.query.limit = Math.min(event.pageSize, MAX_LIMIT);
-    this.usersStore.loadUsers(this.query);
+    this.params.update((p) => ({ ...p, page: event.pageIndex + 1, limit: Math.min(event.pageSize, MAX_LIMIT) }));
   }
 
   protected roleLabel(role: string): string {
-    return this.rolesStore.rolesById().get(role) ?? role;
-  }
-
-  protected trackBy(_: number, user: IUser): string {
-    return user.id;
+    return this.rolesById().get(role) ?? role;
   }
 
   protected userAvatarUrl(user: IUser): string | null {
@@ -139,8 +121,8 @@ export class Users {
 
   private openUserDialog(user?: IUser): void {
     this.dialog
-      .open<UserFormDialog, { roles: IRole[]; user?: IUser }, IUserPayload>(UserFormDialog, {
-        data: { roles: this.rolesStore.roles(), user },
+      .open<UserFormDialog, { user?: IUser }, IUserPayload>(UserFormDialog, {
+        data: { user },
         width: '560px'
       })
       .afterClosed()

@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Service } from '@angular/core';
-import { createParams, IProject } from '@libs/utils';
+import { IProject } from '@libs/utils';
 import { Observable } from 'rxjs';
-import { IProjectPayload, IProjectQuery } from '../interfaces';
+import { IProjectPayload } from '../interfaces';
 
 @Service()
 export class ProjectsService {
@@ -14,10 +14,6 @@ export class ProjectsService {
 
   delete(projectId: string): Observable<void> {
     return this.http.delete<void>(`/projects/${projectId}`);
-  }
-
-  findAll(query: IProjectQuery): Observable<[IProject[], number]> {
-    return this.http.get<[IProject[], number]>('/projects', { params: createParams(query) });
   }
 
   findOne(projectId: string): Observable<IProject> {

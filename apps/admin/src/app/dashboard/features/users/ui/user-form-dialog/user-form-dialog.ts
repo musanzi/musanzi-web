@@ -1,4 +1,5 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { httpResource } from '@angular/common/http';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { email, form, FormField, required, submit, validate } from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -6,6 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { IRole, MAX_LIMIT } from '@libs/utils';
 import { IUserPayload, IUserFormDialog } from '../../interfaces';
 
 @Component({
@@ -25,11 +27,17 @@ export class UserFormDialog {
   protected readonly data = inject<IUserFormDialog>(MAT_DIALOG_DATA);
   private readonly dialogRef = inject(MatDialogRef<UserFormDialog, IUserPayload>);
 
+  protected readonly rolesResource = httpResource<[IRole[], number]>(() => ({
+    url: '/roles',
+    params: { limit: MAX_LIMIT, page: 1 }
+  }));
+  protected readonly roles = computed(() => this.rolesResource.value()?.[0] ?? []);
+
   protected readonly userFormModel = signal({
     name: this.data.user?.name ?? '',
     email: this.data.user?.email ?? '',
     password: '',
-    roles: this.resolveRoleIds(this.data.user?.roles ?? [])
+    roles: this.data.user?.roles ?? []
   });
   protected readonly userForm = form(this.userFormModel, (form) => {
     required(form.name, { message: 'You must enter your name' });
@@ -47,6 +55,18 @@ export class UserFormDialog {
     });
   });
   protected readonly isEdit = computed(() => Boolean(this.data.user));
+
+  constructor() {
+    effect(() => {
+      const roles = this.roles();
+
+      if (roles.length === 0) {
+        return;
+      }
+
+      this.userFormModel.update((model) => ({ ...model, roles: this.resolveRoleIds(model.roles, roles) }));
+    });
+  }
 
   save(event: Event): void {
     event.preventDefault();
@@ -71,9 +91,9 @@ export class UserFormDialog {
     });
   }
 
-  private resolveRoleIds(values: string[]): string[] {
-    const rolesByName = new Map(this.data.roles.map((role) => [role.name, role.id]));
-    const roleIds = new Set(this.data.roles.map((role) => role.id));
+  private resolveRoleIds(values: string[], roles: IRole[]): string[] {
+    const rolesByName = new Map(roles.map((role) => [role.name, role.id]));
+    const roleIds = new Set(roles.map((role) => role.id));
 
     return values
       .map((value) => {
