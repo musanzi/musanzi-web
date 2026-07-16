@@ -1,0 +1,177 @@
+<section class="flex flex-col gap-6 p-4 sm:p-6 lg:p-8">
+  <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+    <div>
+      <h1 class="text-2xl font-semibold text-on-surface">{{ isEdit() ? 'Edit project' : 'Create project' }}</h1>
+      <p class="mt-1 text-sm text-on-surface-variant">
+        {{ isEdit() ? 'Update project content and replace the image when needed.' : 'Create a project entry for the portfolio.' }}
+      </p>
+    </div>
+
+    <a matButton="outlined" routerLink="/projects">
+      <mat-icon svgIcon="arrow-left" />
+      Back to projects
+    </a>
+  </div>
+
+  @if (projectResource.isLoading()) {
+  <mat-card appearance="filled" aria-busy="true" aria-label="Loading project form">
+    <mat-card-content class="grid gap-6 p-6">
+      <div class="h-8 w-48 animate-pulse rounded-full bg-neutral-300"></div>
+      <div class="h-14 animate-pulse rounded bg-neutral-200"></div>
+      <div class="h-32 animate-pulse rounded bg-neutral-200"></div>
+      <div class="h-24 animate-pulse rounded bg-neutral-200"></div>
+    </mat-card-content>
+  </mat-card>
+  } @else {
+  <form class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]" novalidate (submit)="save($event)">
+    <mat-card appearance="filled">
+      <mat-card-header>
+        <div class="flex items-center gap-x-2">
+          <mat-icon class="size-4" svgIcon="app-window" />
+          <div class="font-medium tracking-tight">Project details</div>
+        </div>
+      </mat-card-header>
+
+      <mat-card-content class="grid gap-5">
+        <mat-form-field>
+          <mat-label>Name</mat-label>
+          <input
+            matInput
+            autocomplete="off"
+            cdkFocusInitial
+            name="name"
+            required
+            [ngModel]="projectModel().name"
+            (ngModelChange)="updateName($event)"
+            #nameField="ngModel" />
+          @if (nameField.invalid && (nameField.touched || nameField.dirty)) {
+          <mat-error>Enter a project name.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Summary</mat-label>
+          <textarea
+            matInput
+            class="min-h-36 resize-y"
+            name="summary"
+            required
+            [ngModel]="projectModel().summary"
+            (ngModelChange)="updateSummary($event)"
+            #summaryField="ngModel"></textarea>
+          @if (summaryField.invalid && (summaryField.touched || summaryField.dirty)) {
+          <mat-error>Enter a project summary.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-divider />
+
+        <div class="grid gap-4">
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <div class="font-medium">Links</div>
+              <div class="mt-1 text-sm text-on-surface-variant">Add project resources with absolute URLs.</div>
+            </div>
+
+            <button matButton="outlined" type="button" (click)="addLink()">
+              <mat-icon svgIcon="plus" />
+              Add link
+            </button>
+          </div>
+
+          @if (projectModel().links.length === 0) {
+          <div
+            class="rounded border border-dashed border-neutral-300 px-4 py-6 text-center text-sm text-on-surface-variant">
+            No links added.
+          </div>
+          } @else {
+          <div class="grid gap-3">
+            @for (link of projectModel().links; track trackLink($index)) {
+            <div
+              class="grid gap-3 rounded border border-neutral-200 bg-white p-3 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)_2.5rem] md:items-start">
+              <mat-form-field>
+                <mat-label>Label</mat-label>
+                <input
+                  matInput
+                  required
+                  [name]="'link-label-' + $index"
+                  [ngModel]="link.label"
+                  (ngModelChange)="updateLinkLabel($index, $event)"
+                  #linkLabelField="ngModel" />
+                @if (linkLabelField.invalid && (linkLabelField.touched || linkLabelField.dirty)) {
+                <mat-error>Enter a link label.</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field>
+                <mat-label>URL</mat-label>
+                <input
+                  matInput
+                  inputmode="url"
+                  placeholder="https://example.com"
+                  required
+                  pattern="https?://.+"
+                  [name]="'link-href-' + $index"
+                  [ngModel]="link.href"
+                  (ngModelChange)="updateLinkHref($index, $event)"
+                  #linkHrefField="ngModel" />
+                @if (linkHrefField.invalid && (linkHrefField.touched || linkHrefField.dirty)) {
+                <mat-error>{{ linkHrefError(link) ?? 'Enter a valid URL.' }}</mat-error>
+                }
+              </mat-form-field>
+
+              <button matIconButton type="button" aria-label="Remove link" (click)="removeLink($index)">
+                <mat-icon svgIcon="trash-2" />
+              </button>
+            </div>
+            }
+          </div>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <div class="grid content-start gap-6">
+      <mat-card appearance="filled">
+        <mat-card-header>
+          <div class="flex items-center gap-x-2">
+            <mat-icon class="size-4" svgIcon="image" />
+            <div class="font-medium tracking-tight">Project image</div>
+          </div>
+        </mat-card-header>
+
+        <mat-card-content class="grid gap-4">
+          <div
+            class="flex aspect-video items-center justify-center overflow-hidden rounded border border-neutral-200 bg-neutral-100 text-neutral-500">
+            @if (displayImageUrl(); as imageUrl) {
+            <img class="size-full object-cover" [src]="imageUrl" alt="Project preview" />
+            } @else {
+            <mat-icon class="size-10" svgIcon="image" />
+            }
+          </div>
+
+          <div class="text-sm text-on-surface-variant">
+            Uploading a new image replaces the current project image. Removing images is not available from this API.
+          </div>
+
+          <input #imageInput class="hidden" type="file" accept="image/*" (change)="chooseImage($event)" />
+          <button matButton="outlined" type="button" [disabled]="projectsStore.isSaving()" (click)="imageInput.click()">
+            <mat-icon svgIcon="upload" />
+            {{ imageFile() ? 'Change selected image' : 'Choose image' }}
+          </button>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card appearance="filled">
+        <mat-card-content class="flex flex-col gap-3">
+          <button matButton="filled" type="submit" [disabled]="formInvalid() || projectsStore.isSaving()">
+            <mat-icon svgIcon="save" />
+            {{ projectsStore.isSaving() ? 'Saving...' : isEdit() ? 'Save project' : 'Create project' }}
+          </button>
+          <a matButton="outlined" routerLink="/projects">Cancel</a>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </form>
+  }
+</section>

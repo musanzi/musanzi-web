@@ -1,0 +1,40 @@
+<section class="flex flex-col gap-6 p-4 sm:p-6 lg:p-8">
+  <div>
+    <h1 class="text-2xl font-semibold text-on-surface">Admin dashboard</h1>
+    <p class="mt-1 text-sm text-on-surface-variant">Review the main administration statistics.</p>
+  </div>
+
+  <div class="grid gap-4 sm:gap-6 max-md:grid-cols-1 md:grid-cols-4">
+    @if (statsResource.isLoading()) {
+      @for (item of [1, 2]; track item) {
+        <mat-card appearance="filled" aria-busy="true" aria-label="Loading statistics">
+          <mat-card-header>
+            <div class="flex items-center gap-x-2">
+              <div class="h-4 w-28 animate-pulse rounded-full bg-neutral-300"></div>
+            </div>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="h-14 w-24 animate-pulse rounded-full bg-neutral-300"></div>
+          </mat-card-content>
+        </mat-card>
+      }
+    } @else if (statsResource.hasValue()) {
+      @for (item of statsResource.value(); track item.label) {
+        <mat-card appearance="filled">
+          <mat-card-header>
+            <div class="flex items-center gap-x-2">
+              <div class="font-medium tracking-tight">{{ item.label }}</div>
+            </div>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="text-5xl font-semibold tabular-nums">{{ item.total | number }}</div>
+          </mat-card-content>
+        </mat-card>
+      }
+    }
+  </div>
+
+  @if (!statsResource.isLoading() && statsResource.value()?.length === 0) {
+    <div class="flex min-h-32 items-center justify-center text-sm text-on-surface-variant">No statistics found.</div>
+  }
+</section>

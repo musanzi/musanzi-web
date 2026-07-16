@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { AuthStore } from './auth/data-access';
+import { AuthStore } from './features/auth/data-access';
 import { Loader } from '@libs/ui';
 
 @Component({
