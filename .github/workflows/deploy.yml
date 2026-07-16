@@ -13,7 +13,6 @@ jobs:
     name: Deploy to VPS
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    needs: ci
     environment: production
 
     steps:
