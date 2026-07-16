@@ -1,4 +1,4 @@
-<main class="mx-auto w-[calc(100%-4rem)] max-w-4xl overflow-x-hidden py-9 pb-24 md:py-12">
+<main class="mx-auto w-[calc(100%-2rem)] max-w-4xl overflow-x-hidden py-9 pb-24 md:py-12">
   <header class="mb-10">
     <a matButton="outlined" routerLink="/blog">
       <mat-icon svgIcon="arrow-left" />
@@ -37,7 +37,7 @@
 
         <h1 class="mt-4 text-2xl leading-7 font-bold text-gray-950">{{ article.title }}</h1>
 
-        <p class="mt-6 text-lg leading-6 text-gray-600">{{ article.summary }}</p>
+        <p class="mt-6 md:text-lg md:leading-6 text-gray-600">{{ article.summary }}</p>
       </div>
 
       @if (coverUrl(); as cover) {
