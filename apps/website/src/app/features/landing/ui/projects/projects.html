@@ -1,41 +1,37 @@
 @if (projects.isLoading() || ((projects.value()?.[1] || 0) > 0 && projects.hasValue())) {
   <section id="projects" class="mb-14 scroll-mt-8 md:mb-22" [attr.aria-busy]="projects.isLoading()">
-    <div class="flex items-center gap-2">
-      <p class="inline-flex items-center gap-2 text-base font-extrabold whitespace-nowrap text-gray-500">
-        <mat-icon class="size-4.5" svgIcon="app-window" />
+    <div class="mb-3 flex items-center gap-2.5">
+      <p
+        class="inline-flex items-center gap-1.5 text-sm leading-4 font-semibold tracking-wide whitespace-nowrap text-neutral-500">
+        <mat-icon class="size-4 text-primary-600" svgIcon="app-window" />
         Projects
       </p>
-      <div class="h-px w-full bg-gray-300"></div>
+      <div class="h-px w-full bg-neutral-300"></div>
     </div>
-    <h2 class="mt-3 mb-5 max-w-[18ch] text-3xl leading-tight font-extrabold text-gray-950 md:text-4xl">
-      Selected work.
-    </h2>
-    <p class="mb-8 max-w-2xl text-lg leading-6 text-gray-600">
-      Production platform work shaped around maintainability, deployment, and operational constraints.
-    </p>
+    <h2 class="mb-5 max-w-[18ch] text-2xl leading-tight font-bold text-neutral-900">Selected work.</h2>
 
     @if (projects.isLoading()) {
       <div class="grid gap-y-10" aria-hidden="true">
         @for (item of skeletonProjects; track item; let index = $index) {
-          <mat-card appearance="outlined" class="overflow-hidden border-gray-200 bg-white">
+          <mat-card appearance="outlined" class="overflow-hidden rounded-xl border-neutral-200 bg-white">
             <mat-card-content class="grid gap-5 p-0 lg:grid-cols-[minmax(0,1.05fr)_minmax(20rem,0.95fr)]">
               <div class="min-w-0 p-5 md:p-6" [ngClass]="{ 'lg:order-2': index % 2 === 1 }">
                 <div class="mt-2 flex animate-pulse flex-col gap-3">
-                  <div class="h-8 w-2/3 rounded-md bg-gray-200"></div>
+                  <div class="h-8 w-2/3 rounded-lg bg-neutral-100"></div>
                   <div class="mt-1 grid gap-2">
-                    <div class="h-4 w-full rounded-md bg-gray-200"></div>
-                    <div class="h-4 w-11/12 rounded-md bg-gray-200"></div>
-                    <div class="h-4 w-3/5 rounded-md bg-gray-200"></div>
+                    <div class="h-4 w-full rounded-lg bg-neutral-100"></div>
+                    <div class="h-4 w-11/12 rounded-lg bg-neutral-100"></div>
+                    <div class="h-4 w-3/5 rounded-lg bg-neutral-100"></div>
                   </div>
                   <div class="mt-3 flex flex-wrap gap-3">
-                    <div class="h-10 w-24 rounded-md bg-gray-200"></div>
-                    <div class="h-10 w-28 rounded-md bg-gray-200"></div>
+                    <div class="h-10 w-24 rounded-lg bg-neutral-100"></div>
+                    <div class="h-10 w-28 rounded-lg bg-neutral-100"></div>
                   </div>
                 </div>
               </div>
 
               <div class="min-w-0" [ngClass]="{ 'lg:order-1': index % 2 === 1 }">
-                <div class="aspect-16/10 w-full animate-pulse bg-gray-200"></div>
+                <div class="aspect-16/10 w-full animate-pulse bg-neutral-100"></div>
               </div>
             </mat-card-content>
           </mat-card>
@@ -44,18 +40,18 @@
     } @else {
       <div class="grid gap-y-10">
         @for (project of projects.value()?.[0]; track project.name; let index = $index) {
-          <article class="group grid gap-5 rounded-lg transition lg:grid-cols-[minmax(0,1.05fr)_minmax(20rem,0.95fr)]">
+          <article class="group grid gap-5 rounded-xl transition lg:grid-cols-[minmax(0,1.05fr)_minmax(20rem,0.95fr)]">
             <div class="min-w-0" [ngClass]="{ 'lg:order-2': index % 2 === 1 }">
               <div class="mt-2 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
-                <h3 class="text-2xl leading-snug font-medium text-gray-950">{{ project.name }}</h3>
+                <h3 class="text-2xl leading-snug font-medium text-neutral-900">{{ project.name }}</h3>
               </div>
 
-              <p class="mt-3 leading-6 text-gray-600">{{ project.summary }}</p>
+              <p class="mt-3 leading-6 text-neutral-600">{{ project.summary }}</p>
 
               <div class="mt-6 flex flex-wrap gap-3">
                 @for (link of project.links; track link.href) {
                   <a
-                    class="inline-flex min-h-10 items-center gap-1.5 rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition hover:border-gray-400 hover:text-gray-950"
+                    class="inline-flex min-h-10 items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm font-medium text-neutral-700 transition hover:border-neutral-300 hover:bg-neutral-50 hover:text-neutral-900"
                     [href]="link.href"
                     target="_blank"
                     rel="noreferrer">
@@ -68,7 +64,7 @@
 
             <div class="min-w-0" [ngClass]="{ 'lg:order-1': index % 2 === 1 }">
               <img
-                class="aspect-16/10 w-full rounded-lg border border-gray-300 object-cover object-top-left"
+                class="aspect-16/10 w-full rounded-xl object-cover object-top-left shadow-sm ring-1 ring-neutral-200"
                 [src]="coverUrl(project.image)"
                 [alt]="project.name"
                 loading="lazy" />
