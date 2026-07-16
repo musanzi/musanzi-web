@@ -40,12 +40,12 @@ export class ArticleForm {
   private readonly router = inject(Router);
   protected readonly articlesStore = inject(ArticlesStore);
 
-  protected readonly articleId = signal(this.route.snapshot.paramMap.get('id'));
+  protected readonly articleId = this.route.snapshot.paramMap.get('id');
   protected readonly coverFile = signal<File | null>(null);
   protected readonly coverPreviewUrl = signal<string | null>(null);
 
   protected readonly articleResource = httpResource<IArticle>(() =>
-    this.articleId ? { url: `/articles/admin/${this.articleId()}` } : undefined
+    this.articleId ? { url: `/articles/admin/${this.articleId}` } : undefined
   );
 
   protected readonly articleModel = linkedSignal<IArticleForm>(() => {
@@ -110,7 +110,7 @@ export class ArticleForm {
       };
 
       this.articlesStore.saveArticle({
-        articleId: this.articleId() ?? undefined,
+        articleId: this.articleId ?? undefined,
         cover: this.coverFile(),
         payload
       });

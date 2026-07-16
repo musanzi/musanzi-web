@@ -1,18 +1,18 @@
 <h2 mat-dialog-title>{{ isEdit() ? 'Edit role' : 'Create role' }}</h2>
 
 <form (submit)="save($event)">
-  <mat-dialog-content class="min-w-80">
+  <mat-dialog-content class="min-w-80 py-2">
     <mat-form-field class="w-full">
       <mat-label>Name</mat-label>
       <input matInput [formField]="roleForm.name" autocomplete="off" cdkFocusInitial />
       @if ((roleForm.name().touched() || roleForm.name().dirty()) && roleForm.name().errors()[0]; as error) {
-      <mat-error>{{ error.message }}</mat-error>
+        <mat-error>{{ error.message }}</mat-error>
       }
     </mat-form-field>
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">
-    <button matButton type="button" [mat-dialog-close]="undefined">Cancel</button>
+    <button matButton="outlined" type="button" [mat-dialog-close]="undefined">Cancel</button>
     <button matButton="filled" type="submit" [disabled]="roleForm().invalid()">
       <mat-icon svgIcon="save" />
       {{ isEdit() ? 'Save' : 'Create' }}

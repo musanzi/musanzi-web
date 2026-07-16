@@ -1,12 +1,12 @@
 <h2 mat-dialog-title>{{ isEdit() ? 'Edit user' : 'Create user' }}</h2>
 
 <form (submit)="save($event)">
-  <mat-dialog-content class="grid min-w-80 gap-4 sm:min-w-120">
+  <mat-dialog-content class="grid min-w-80 gap-4 sm:min-w-120 py-2">
     <mat-form-field>
       <mat-label>Name</mat-label>
       <input matInput [formField]="userForm.name" autocomplete="name" cdkFocusInitial />
       @if ((userForm.name().touched() || userForm.name().dirty()) && userForm.name().errors()[0]; as error) {
-      <mat-error>{{ error.message }}</mat-error>
+        <mat-error>{{ error.message }}</mat-error>
       }
     </mat-form-field>
 
@@ -14,7 +14,7 @@
       <mat-label>Email</mat-label>
       <input matInput type="email" [formField]="userForm.email" autocomplete="email" />
       @if ((userForm.email().touched() || userForm.email().dirty()) && userForm.email().errors()[0]; as error) {
-      <mat-error>{{ error.message }}</mat-error>
+        <mat-error>{{ error.message }}</mat-error>
       }
     </mat-form-field>
 
@@ -27,11 +27,11 @@
       <mat-label>Roles</mat-label>
       <mat-select [formField]="userForm.roles" multiple>
         @for (role of roles(); track role.id) {
-        <mat-option [value]="role.id">{{ role.name }}</mat-option>
+          <mat-option [value]="role.id">{{ role.name }}</mat-option>
         }
       </mat-select>
       @if ((userForm.roles().touched() || userForm.roles().dirty()) && userForm.roles().errors()[0]; as error) {
-      <mat-error>{{ error.message }}</mat-error>
+        <mat-error>{{ error.message }}</mat-error>
       }
     </mat-form-field>
   </mat-dialog-content>
