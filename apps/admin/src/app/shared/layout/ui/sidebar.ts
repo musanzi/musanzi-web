@@ -2,7 +2,7 @@ import { Component, computed, inject } from '@angular/core';
 import { AuthStore } from '@admin/app/features/auth/data-access';
 import { DashboardNavigation, User } from '@libs/ui';
 import { NAVIGATION } from '../data/navigation.data';
-import { getProfileAvatarUrl } from '../../shared/utils';
+import { getProfileAvatarUrl } from '../../utils';
 
 @Component({
   selector: 'admin-sidebar',
