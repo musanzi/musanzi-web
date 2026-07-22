@@ -71,7 +71,7 @@ export class Articles {
   }));
 
   protected readonly articlesResource = httpResource<[IArticle[], number]>(() => ({
-    url: '/articles/admin',
+    url: '/articles',
     params: this.params()
   }));
 

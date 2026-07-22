@@ -45,7 +45,7 @@ export class ArticleForm {
   protected readonly coverPreviewUrl = signal<string | null>(null);
 
   protected readonly articleResource = httpResource<IArticle>(() =>
-    this.articleId ? { url: `/articles/admin/${this.articleId}` } : undefined
+    this.articleId ? { url: `/articles/${this.articleId}` } : undefined
   );
 
   protected readonly articleModel = linkedSignal<IArticleForm>(() => {
